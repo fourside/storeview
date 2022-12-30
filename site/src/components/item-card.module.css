@@ -1,0 +1,44 @@
+.container {
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  background: white;
+  display: grid;
+  grid: auto / auto auto;
+  gap: 8px;
+}
+
+.container[data-active] {
+  outline: 2px solid #0900ff;
+}
+
+.container[data-pinned] {
+  opacity: 0.5;
+}
+
+.image {
+  object-fit: cover;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+}
+
+.category {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background-color: #777;
+  color: white;
+  font-size: small;
+}
+
+.title {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 13;
+  word-break: break-all;
+  margin-bottom: 8px;
+}
+
+.description {
+  font-size: 0.8rem;
+}
