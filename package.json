@@ -1,0 +1,40 @@
+{
+  "name": "storeview",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm start -w batch",
+    "dev": "npm run dev -w site",
+    "lint": "npm run --workspaces lint",
+    "test": "npm run --workspaces test",
+    "check": "npm run --workspaces check",
+    "prepare": "husky install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.30.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "husky": "^8.0.2",
+    "prettier": "^2.8.1",
+    "prisma": "^4.6.1",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.6.1",
+    "dotenv": "^16.0.3"
+  },
+  "workspaces": [
+    "batch",
+    "site"
+  ],
+  "prettier": {
+    "singleQuote": false,
+    "printWidth": 120,
+    "tabWidth": 2,
+    "trailingComma": "es5"
+  }
+}
