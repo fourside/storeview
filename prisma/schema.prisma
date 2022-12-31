@@ -29,3 +29,12 @@ model Latest {
   itemId      String @id
   publishedAt String
 }
+
+model Queue {
+  id        Int      @id @default(autoincrement())
+  url       String
+  directory String
+  dequeued  Boolean
+  createdAt DateTime
+  updatedAt DateTime
+}
