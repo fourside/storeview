@@ -33,7 +33,10 @@ async function scrapePage(page: Page, latest: LatestData): Promise<ItemData[]> {
       return await scrapeRows(page);
     },
     (items: ItemData[]) => {
-      const found = items.findIndex((it) => it.id === latest.id);
+      const found = items.findIndex(
+        // not always found by id
+        (it) => it.id === latest.id || new Date(it.publishedAt).getTime() < new Date(latest.publishedAt).getTime()
+      );
       return [found !== -1, found];
     }
   );

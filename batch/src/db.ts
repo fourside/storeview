@@ -3,6 +3,7 @@ import { ItemData, ImageData } from "./type";
 
 export type LatestData = {
   id: string;
+  publishedAt: string;
 };
 
 export function getClient(): PrismaClient {
@@ -18,7 +19,7 @@ export async function getLatestData(client: PrismaClient): Promise<LatestData> {
   if (latest === null) {
     throw new Error("latest data not exists.");
   }
-  return { id: latest.itemId };
+  return { id: latest.itemId, publishedAt: latest.publishedAt };
 }
 
 export async function saveItemsAndImages(client: PrismaClient, items: ItemData[], images: ImageData[]): Promise<void> {
