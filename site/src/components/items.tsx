@@ -8,6 +8,7 @@ import { EnqueueDialog } from "./enqueue-dialog";
 import { ItemCard } from "./item-card";
 import styles from "./items.module.css";
 import { Loader } from "./loader";
+import { useToaster } from "./toaster";
 
 type ItemsComponentProps = {
   items: Item[];
@@ -24,9 +25,14 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
 
   const [enqueuedItem, setEnqueuedItem] = useState<Item>();
   const [queueing, setQueueing] = useState(false);
+  const { showSuccess, showFailure, Toaster } = useToaster();
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
+      if (enqueuedItem !== undefined) {
+        // not capture key event in modal
+        return;
+      }
       if (event.key === "j") {
         setActiveIndex((prev) => {
           return prev >= items.length - 1 ? prev : prev + 1;
@@ -58,12 +64,13 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
       if (event.key === "o") {
         if (pinnedItems.length > 0) {
           pinnedItems.forEach((it) => window.open(it.url, "_blank", "noopener,noreferrer"));
+          setPinnedItems([]);
+        } else {
+          const activeItem = items[activeIndex];
+          if (activeItem !== undefined) {
+            window.open(activeItem.url, "_blank", "noopener,noreferrer");
+          }
         }
-        const activeItem = items[activeIndex];
-        if (activeItem !== undefined) {
-          window.open(activeItem.url, "_blank", "noopener,noreferrer");
-        }
-        setPinnedItems([]);
       }
       if (event.key === "e") {
         const activeItem = items[activeIndex];
@@ -76,7 +83,7 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
     return () => {
       document.removeEventListener("keydown", handler);
     };
-  }, [activeIndex, items, pinnedItems]);
+  }, [activeIndex, enqueuedItem, items, pinnedItems]);
 
   const fetchNext = useCallback(async () => {
     if (loading || reachedLast) {
@@ -93,10 +100,11 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
       }
     } catch (error) {
       console.error(error);
+      showFailure("failed to fetch the next page");
     } finally {
       setLoading(false);
     }
-  }, [loading, reachedLast]);
+  }, [loading, reachedLast, showFailure]);
 
   const { observedRef } = useIntersectionObserver<HTMLDivElement>(async () => {
     if (loading || reachedLast) {
@@ -113,19 +121,22 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
     setEnqueuedItem(undefined);
   }, []);
 
-  const handleEnqueue = useCallback(async (param: { directory: string; url: string }) => {
-    setQueueing(true);
-    try {
-      await postQueue(param);
-      setEnqueuedItem(undefined);
-      // TODO: toast
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setQueueing(false);
-    }
-  }, []);
-  console.log({ enqueuedItem });
+  const handleEnqueue = useCallback(
+    async (param: { directory: string; url: string }) => {
+      setQueueing(true);
+      try {
+        await postQueue(param);
+        setEnqueuedItem(undefined);
+        showSuccess("success to queue");
+      } catch (error) {
+        console.error(error);
+        showFailure("failed to queue");
+      } finally {
+        setQueueing(false);
+      }
+    },
+    [showFailure, showSuccess]
+  );
 
   return (
     <div className={styles.container}>
@@ -149,6 +160,7 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
       {enqueuedItem !== undefined && (
         <EnqueueDialog item={enqueuedItem} onEnqueue={handleEnqueue} onClose={handleEnqueueModalClose} />
       )}
+      {Toaster}
       {loading && <Loader />}
       <div ref={observedRef} />
     </div>

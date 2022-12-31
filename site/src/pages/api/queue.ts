@@ -6,7 +6,6 @@ export default async function handler(
   req: Pick<NextApiRequest, "body" | "method">,
   res: Pick<NextApiResponse, "status">
 ): Promise<void> {
-  console.log("????????", req.body);
   if (req.method !== "POST") {
     res.status(405);
     return;
