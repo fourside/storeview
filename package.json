@@ -29,7 +29,8 @@
   },
   "workspaces": [
     "batch",
-    "site"
+    "site",
+    "queue"
   ],
   "prettier": {
     "singleQuote": false,
