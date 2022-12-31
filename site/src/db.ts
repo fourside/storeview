@@ -16,3 +16,16 @@ export async function getImage(itemId: string): Promise<Image | null> {
     where: { itemId: itemId },
   });
 }
+
+export async function createQueue(param: { directory: string; url: string }): Promise<number> {
+  const newQueue = await prisma.queue.create({
+    data: {
+      url: param.url,
+      directory: param.directory,
+      dequeued: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  });
+  return newQueue.id;
+}

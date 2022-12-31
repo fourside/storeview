@@ -1,0 +1,130 @@
+.overlay {
+  background-color: #090909ee;
+  position: fixed;
+  inset: 0;
+}
+
+.content {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 90vw;
+  min-height: 35vh;
+  max-height: 85vh;
+  transform: translate(-50%, -50%);
+  padding: 32px;
+}
+
+.content:focus {
+  outline: none;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  position: relative;
+}
+
+.title {
+  margin: 0;
+  font-weight: 500;
+  color: var(--mauve12);
+  font-size: 17px;
+}
+
+.description {
+  color: var(--mauve11);
+  font-size: 15px;
+}
+
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formControl {
+  position: relative;
+  width: 100%;
+  border: none;
+  padding-bottom: 8px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid #c0c0c0;
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 15px;
+}
+.input:focus {
+  box-shadow: 0 0 0 2px var(--violet8);
+}
+.input[data-error="true"] {
+  border-color: #d44;
+}
+
+.errorMessage {
+  position: absolute;
+  bottom: -8px;
+  color: #d44;
+  font-size: small;
+}
+
+.button {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 0 15px;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 500;
+  height: 35px;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  margin-top: 8px;
+}
+
+.button:hover {
+  background-color: #eee;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.closeButton {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background-color: #eee;
+}

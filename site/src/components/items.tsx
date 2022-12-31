@@ -2,8 +2,9 @@
 
 import { Item } from "@prisma/client";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
-import { fetchItems } from "../fetch-client";
+import { fetchItems, postQueue } from "../fetch-client";
 import { useIntersectionObserver } from "../use-intersection-observer";
+import { EnqueueDialog } from "./enqueue-dialog";
 import { ItemCard } from "./item-card";
 import styles from "./items.module.css";
 import { Loader } from "./loader";
@@ -20,6 +21,9 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
 
   const [activeIndex, setActiveIndex] = useState(-1);
   const [pinnedItems, setPinnedItems] = useState<Item[]>([]);
+
+  const [enqueuedItem, setEnqueuedItem] = useState<Item>();
+  const [queueing, setQueueing] = useState(false);
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -61,6 +65,12 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
         }
         setPinnedItems([]);
       }
+      if (event.key === "e") {
+        const activeItem = items[activeIndex];
+        if (activeItem !== undefined) {
+          setEnqueuedItem(activeItem);
+        }
+      }
     };
     document.addEventListener("keydown", handler);
     return () => {
@@ -95,6 +105,28 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
     await fetchNext();
   });
 
+  const handleEnqueueModalOpen = useCallback((item: Item) => {
+    setEnqueuedItem(item);
+  }, []);
+
+  const handleEnqueueModalClose = useCallback(() => {
+    setEnqueuedItem(undefined);
+  }, []);
+
+  const handleEnqueue = useCallback(async (param: { directory: string; url: string }) => {
+    setQueueing(true);
+    try {
+      await postQueue(param);
+      setEnqueuedItem(undefined);
+      // TODO: toast
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setQueueing(false);
+    }
+  }, []);
+  console.log({ enqueuedItem });
+
   return (
     <div className={styles.container}>
       <div className={styles.grid}>
@@ -104,6 +136,8 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
             item={item}
             isActive={index === activeIndex}
             pinned={pinnedItems.some((it) => it.id === item.id)}
+            queueing={queueing && item === enqueuedItem}
+            onEnqueueModalOpen={handleEnqueueModalOpen}
           />
         ))}
       </div>
@@ -111,6 +145,9 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
         <div className={styles.pinnedCount}>
           pinned <strong>{pinnedItems.length}</strong> items
         </div>
+      )}
+      {enqueuedItem !== undefined && (
+        <EnqueueDialog item={enqueuedItem} onEnqueue={handleEnqueue} onClose={handleEnqueueModalClose} />
       )}
       {loading && <Loader />}
       <div ref={observedRef} />

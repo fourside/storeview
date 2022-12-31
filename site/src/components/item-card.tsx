@@ -1,15 +1,28 @@
 import { Item } from "@prisma/client";
-import { FC, useEffect, useRef } from "react";
+import Image from "next/image";
+import { FC, MouseEvent, useCallback, useEffect, useRef } from "react";
 import styles from "./item-card.module.css";
 
 type ItemCardProps = {
   item: Item;
   isActive: boolean;
   pinned: boolean;
+  queueing: boolean;
+  onEnqueueModalOpen: (item: Item) => void;
 };
 
 export const ItemCard: FC<ItemCardProps> = (props) => {
+  const { onEnqueueModalOpen } = props;
   const ref = useRef<HTMLAnchorElement>(null);
+
+  const handleClick = useCallback(
+    (event: MouseEvent) => {
+      event.stopPropagation();
+      event.preventDefault();
+      onEnqueueModalOpen(props.item);
+    },
+    [onEnqueueModalOpen, props.item]
+  );
 
   useEffect(() => {
     if (props.isActive && ref.current !== null) {
@@ -35,14 +48,19 @@ export const ItemCard: FC<ItemCardProps> = (props) => {
         alt={props.item.title}
       />
       <div>
-        <span
-          className={styles.category}
-          style={{
-            backgroundColor: labelColor(props.item.category.length),
-          }}
-        >
-          {props.item.category}
-        </span>
+        <div className={styles.header}>
+          <span
+            className={styles.category}
+            style={{
+              backgroundColor: labelColor(props.item.category.length),
+            }}
+          >
+            {props.item.category}
+          </span>
+          <button onClick={handleClick} className={styles.iconButton} title="enqueue" disabled={props.queueing}>
+            <Image src="/download.svg" width="16" height="16" alt="download" />
+          </button>
+        </div>
         <h3 className={styles.title} title={props.item.title}>
           {props.item.title}
         </h3>
