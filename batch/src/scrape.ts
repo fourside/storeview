@@ -113,7 +113,8 @@ async function scrapeRows(page: Page): Promise<ItemData[]> {
         return [];
       }
       const titleAnchor = row.querySelector(".gl3c.glname a");
-      const title = titleAnchor?.textContent;
+      const titleElement = titleAnchor?.querySelector(".glink");
+      const title = titleElement?.textContent;
       const urlString = titleAnchor?.getAttribute("href");
       const category = row.querySelector(".gl1c.glcat")?.textContent;
 
