@@ -20,12 +20,17 @@ if (process.argv[1] === __filename) {
 async function subscribe(prisma: PrismaClient): Promise<void> {
   const queueList = await getQueueData(prisma);
   for (const queue of queueList) {
-    const directory = path.join("../data/", queue.directory);
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    fs.mkdir(directory, () => {});
-    await scrape(queue.url, directory);
-    await dequeue(prisma, queue);
-    await sleep(1000 * 10);
+    try {
+      const directory = path.join("../data/", queue.directory);
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      fs.mkdir(directory, () => {});
+      await scrape(queue.url, directory);
+      await dequeue(prisma, queue);
+      await sleep(1000 * 10);
+    } catch (error) {
+      console.error(error);
+      console.log("caused queue:", queue);
+    }
   }
 
   await sleep(10 * 60 * 1000);

@@ -7,7 +7,7 @@ import { sleep } from "./sleep";
 export async function scrape(listUrl: string, directory: string): Promise<void> {
   const browser = await puppeteer.launch({
     executablePath: Env.chromePath,
-    headless: false,
+    headless: true,
     defaultViewport: {
       width: 1920,
       height: 1080,
