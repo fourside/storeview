@@ -16,10 +16,14 @@ export async function scrape(listUrl: string, directory: string): Promise<void> 
 
   try {
     const page = await browser.newPage();
-    await page.goto(listUrl, {
-      waitUntil: "networkidle2",
-    });
-    const url = await getFirstURL(page);
+    let [url, error] = await getFirstImageURL(page, listUrl);
+    if (error !== undefined) {
+      const newListUrl = `${listUrl}?nw=always`;
+      [url, error] = await getFirstImageURL(page, newListUrl);
+      if (error !== undefined) {
+        throw error;
+      }
+    }
     const totalPage = await getTotalPage(page);
     await page.goto(url, {
       waitUntil: "networkidle2",
@@ -30,13 +34,15 @@ export async function scrape(listUrl: string, directory: string): Promise<void> 
   }
 }
 
-async function getFirstURL(listPage: Page): Promise<string> {
-  const firstImage = await listPage.$("#gdt a");
+async function getFirstImageURL(page: Page, listUrl: string): Promise<[string, Error | undefined]> {
+  await page.goto(listUrl, { waitUntil: "networkidle2" });
+  const firstImage = await page.$("#gdt a");
   const hrefProperty = await firstImage?.getProperty("href");
   if (hrefProperty === undefined) {
-    throw new Error("not scrape first image href");
+    return ["", new Error("not scrape first image href")];
   }
-  return await hrefProperty.jsonValue();
+  const url = await hrefProperty.jsonValue();
+  return [url, undefined];
 }
 
 async function getTotalPage(listPage: Page): Promise<number> {
