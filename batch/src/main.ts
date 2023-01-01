@@ -4,6 +4,7 @@ import path from "node:path";
 import { closeClient, dequeue, getClient, getLatestData, getQueueData, saveItemsAndImages } from "./db";
 import { Env } from "./env";
 import { fetchImages } from "./http";
+import { RemovedError } from "./removed-error";
 import { scrapeImages } from "./scrape-images";
 import { scrapeItems } from "./scrape-items";
 import { sleep } from "./sleep";
@@ -66,6 +67,11 @@ async function subscribe(dbClient: PrismaClient): Promise<void> {
       await dequeue(dbClient, queue);
       await sleep(1000 * 10);
     } catch (error) {
+      if (error instanceof RemovedError) {
+        console.error("removed", queue);
+        await dequeue(dbClient, queue);
+        continue;
+      }
       console.error(error);
       console.log("caused queue:", queue);
     }

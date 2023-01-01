@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import puppeteer, { Page } from "puppeteer-core";
 import { Env } from "./env";
+import { RemovedError } from "./removed-error";
 import { sleep } from "./sleep";
 
 export async function scrapeImages(listUrl: string, directory: string): Promise<void> {
@@ -18,6 +19,9 @@ export async function scrapeImages(listUrl: string, directory: string): Promise<
     const page = await browser.newPage();
     let [url, error] = await getFirstImageURL(page, listUrl);
     if (error !== undefined) {
+      if (error instanceof RemovedError) {
+        throw error;
+      }
       const newListUrl = `${listUrl}?nw=always`;
       [url, error] = await getFirstImageURL(page, newListUrl);
       if (error !== undefined) {
@@ -35,10 +39,14 @@ export async function scrapeImages(listUrl: string, directory: string): Promise<
 }
 
 async function getFirstImageURL(page: Page, listUrl: string): Promise<[string, Error | undefined]> {
-  await page.goto(listUrl, { waitUntil: "networkidle2" });
+  const response = await page.goto(listUrl, { waitUntil: "networkidle2" });
   const firstImage = await page.$("#gdt a");
   const hrefProperty = await firstImage?.getProperty("href");
   if (hrefProperty === undefined) {
+    const chain = response?.request().redirectChain();
+    if (chain !== undefined && chain.length > 0) {
+      return ["", new RemovedError()];
+    }
     return ["", new Error("not scrape first image href")];
   }
   const url = await hrefProperty.jsonValue();
