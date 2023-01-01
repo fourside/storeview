@@ -29,8 +29,13 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (enqueuedItem !== undefined) {
+          setEnqueuedItem(undefined);
+        }
+      }
       if (enqueuedItem !== undefined) {
-        // not capture key event in modal
+        // not capture key event in modal except esc
         return;
       }
       if (event.key === "j") {
