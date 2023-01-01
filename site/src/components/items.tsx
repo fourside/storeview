@@ -131,8 +131,8 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
     async (param: { directory: string; url: string }) => {
       setQueueing(true);
       try {
-        await postQueue(param);
         setEnqueuedItem(undefined);
+        await postQueue(param);
         showSuccess("success to queue");
       } catch (error) {
         console.error(error);
