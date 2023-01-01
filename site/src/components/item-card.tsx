@@ -71,10 +71,10 @@ export const ItemCard: FC<ItemCardProps> = (props) => {
 };
 
 function labelColor(num: number): string {
-  if (num > 6) {
+  if (num > 8) {
     return "#f09010";
   }
-  if (num > 9) {
+  if (num > 6) {
     return "#7700bb";
   }
   return "#ff6050";
