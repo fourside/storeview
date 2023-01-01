@@ -27,6 +27,8 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
   const [queueing, setQueueing] = useState(false);
   const { showSuccess, showFailure, Toaster } = useToaster();
 
+  const prevKeyRef = useRef<string>();
+
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -37,6 +39,9 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
       if (enqueuedItem !== undefined) {
         // not capture key event in modal except esc
         return;
+      }
+      if (event.key === "g" && prevKeyRef.current === "g") {
+        setActiveIndex(0);
       }
       if (event.key === "j") {
         setActiveIndex((prev) => {
@@ -84,6 +89,7 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
           setEnqueuedItem(activeItem);
         }
       }
+      prevKeyRef.current = event.key;
     };
     document.addEventListener("keydown", handler);
     return () => {
