@@ -11,3 +11,9 @@ export type ImageData = {
   itemId: string;
   image: Buffer;
 };
+
+export type QueueData = {
+  id: number;
+  url: string;
+  directory: string;
+};

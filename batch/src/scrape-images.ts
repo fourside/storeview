@@ -4,7 +4,7 @@ import puppeteer, { Page } from "puppeteer-core";
 import { Env } from "./env";
 import { sleep } from "./sleep";
 
-export async function scrape(listUrl: string, directory: string): Promise<void> {
+export async function scrapeImages(listUrl: string, directory: string): Promise<void> {
   const browser = await puppeteer.launch({
     executablePath: Env.chromePath,
     headless: true,

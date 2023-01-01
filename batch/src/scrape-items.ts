@@ -5,7 +5,7 @@ import { Env } from "./env";
 import { sleep } from "./sleep";
 import { ItemData } from "./type";
 
-export async function scrape(url: string, latest: LatestData): Promise<ItemData[]> {
+export async function scrapeItems(url: string, latest: LatestData): Promise<ItemData[]> {
   const browser = await puppeteer.launch({
     executablePath: Env.chromePath,
     headless: true,

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm start -w batch",
+    "items": "npm run items -w batch",
+    "subscribe": "npm run subscribe -w batch",
     "dev": "npm run dev -w site",
     "lint": "npm run --workspaces lint",
     "test": "npm run --workspaces test",
@@ -29,8 +30,7 @@
   },
   "workspaces": [
     "batch",
-    "site",
-    "queue"
+    "site"
   ],
   "prettier": {
     "singleQuote": false,

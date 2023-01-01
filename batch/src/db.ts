@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { ItemData, ImageData } from "./type";
+import { ItemData, ImageData, QueueData } from "./type";
 
 export type LatestData = {
   id: string;
@@ -43,6 +43,29 @@ export async function saveItemsAndImages(client: PrismaClient, items: ItemData[]
       data: {
         itemId: items[0].id,
         publishedAt: items[0].publishedAt,
+      },
+    }),
+  ]);
+}
+
+export async function getQueueData(client: PrismaClient): Promise<QueueData[]> {
+  return await client.queue.findMany({
+    where: {
+      dequeued: false,
+    },
+    orderBy: [{ id: "asc" }],
+  });
+}
+
+export async function dequeue(client: PrismaClient, queueData: QueueData): Promise<void> {
+  await client.$transaction([
+    client.queue.update({
+      where: {
+        id: queueData.id,
+      },
+      data: {
+        dequeued: true,
+        updatedAt: new Date(),
       },
     }),
   ]);

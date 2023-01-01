@@ -4,8 +4,8 @@
   "description": "",
   "main": "src/main.ts",
   "scripts": {
-    "start": "ts-node src/main.ts",
-    "start:prod": "NODE_ENV=production ts-node src/main.ts",
+    "items": "ts-node src/main.ts items",
+    "subscribe": "ts-node src/main.ts subscribe",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src/*.ts",
     "check": "tsc --noEmit && npm run lint"
