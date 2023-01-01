@@ -80,6 +80,7 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
       if (event.key === "e") {
         const activeItem = items[activeIndex];
         if (activeItem !== undefined) {
+          event.preventDefault();
           setEnqueuedItem(activeItem);
         }
       }
