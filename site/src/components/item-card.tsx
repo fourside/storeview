@@ -64,6 +64,7 @@ export const ItemCard: FC<ItemCardProps> = (props) => {
         <h3 className={styles.title} title={props.item.title}>
           {props.item.title}
         </h3>
+        <div className={styles.description}>{props.item.totalPage} pages</div>
         <div className={styles.description}>{props.item.publishedAt}</div>
       </div>
     </a>

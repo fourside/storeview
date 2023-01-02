@@ -17,6 +17,7 @@ const itemResponse = z.array(
     title: z.string(),
     url: z.string(),
     category: z.string(),
+    totalPage: z.number(),
     publishedAt: z.string(),
   })
 );
