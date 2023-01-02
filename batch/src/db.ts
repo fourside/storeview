@@ -30,6 +30,7 @@ export async function saveItemsAndImages(client: PrismaClient, items: ItemData[]
         title: it.title,
         url: it.url,
         category: it.category,
+        totalPage: it.totalPage,
         publishedAt: it.publishedAt,
       })),
       skipDuplicates: true,

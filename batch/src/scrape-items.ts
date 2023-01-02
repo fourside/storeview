@@ -118,6 +118,10 @@ async function scrapeRows(page: Page): Promise<ItemData[]> {
       const urlString = titleAnchor?.getAttribute("href");
       const category = row.querySelector(".gl1c.glcat")?.textContent;
 
+      const totalPageString = row.querySelector(".gl4c div:nth-child(2)")?.textContent;
+      assertNotEmpty(totalPageString, "totalPage");
+      const totalPage = Number.parseInt(totalPageString);
+
       const publishedAt = row.querySelector(".gl2c")?.textContent?.slice(-16);
       const imgElement = row.querySelector(".gl2c .glthumb img");
       const imageUrl = imgElement?.getAttribute("data-src") ?? imgElement?.getAttribute("src");
@@ -131,7 +135,7 @@ async function scrapeRows(page: Page): Promise<ItemData[]> {
       const url = new URL(urlString);
       const id = url.pathname.slice(2);
 
-      return [{ id, title, url: urlString, category, publishedAt, imageUrl }];
+      return [{ id, title, url: urlString, category, totalPage, publishedAt, imageUrl }];
     });
   }, trSelector);
 }

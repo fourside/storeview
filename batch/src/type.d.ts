@@ -3,6 +3,7 @@ export type ItemData = {
   title: string;
   url: string;
   category: string;
+  totalPage: number;
   publishedAt: string;
   imageUrl: string;
 };
