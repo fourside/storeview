@@ -15,6 +15,7 @@ model Item {
   title       String
   url         String
   category    String
+  totalPage   Int @default(0)
   publishedAt String
   Image       Image?
 }
