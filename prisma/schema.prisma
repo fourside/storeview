@@ -15,9 +15,10 @@ model Item {
   title       String
   url         String
   category    String
-  totalPage   Int @default(0)
+  totalPage   Int    @default(0)
   publishedAt String
   Image       Image?
+  Queue       Queue?
 }
 
 model Image {
@@ -36,6 +37,8 @@ model Queue {
   url       String
   directory String
   dequeued  Boolean
+  itemId    String?  @unique
+  Item      Item?    @relation(fields: [itemId], references: [id])
   createdAt DateTime
   updatedAt DateTime
 }
