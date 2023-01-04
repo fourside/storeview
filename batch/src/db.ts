@@ -50,12 +50,21 @@ export async function saveItemsAndImages(client: PrismaClient, items: ItemData[]
 }
 
 export async function getQueueData(client: PrismaClient): Promise<QueueData[]> {
-  return await client.queue.findMany({
+  const queueDataList = await client.queue.findMany({
     where: {
       dequeued: false,
     },
     orderBy: [{ id: "asc" }],
+    include: {
+      Item: true,
+    },
   });
+  return queueDataList.map((it) => ({
+    id: it.id,
+    directory: it.directory,
+    url: it.url,
+    totalPage: it.Item?.totalPage ?? 0,
+  }));
 }
 
 export async function dequeue(client: PrismaClient, queueData: QueueData): Promise<void> {

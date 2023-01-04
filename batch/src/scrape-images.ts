@@ -5,7 +5,7 @@ import { Env } from "./env";
 import { RemovedError } from "./removed-error";
 import { sleep } from "./sleep";
 
-export async function scrapeImages(listUrl: string, directory: string): Promise<void> {
+export async function scrapeImages(listUrl: string, directory: string, imageCount: number): Promise<void> {
   const browser = await puppeteer.launch({
     executablePath: Env.chromePath,
     headless: true,
@@ -17,13 +17,16 @@ export async function scrapeImages(listUrl: string, directory: string): Promise<
 
   try {
     const page = await browser.newPage();
-    let [url, error] = await getFirstImageURL(page, listUrl);
+    const pageCount = imageCount / 40;
+    const listPageUrl = pageCount === 0 ? listUrl : `${listUrl}?p=${pageCount}`;
+    const startImageCount = imageCount % 40;
+    let [url, error] = await getFirstImageURL(page, listPageUrl, startImageCount);
     if (error !== undefined) {
       if (error instanceof RemovedError) {
         throw error;
       }
-      const newListUrl = `${listUrl}?nw=always`;
-      [url, error] = await getFirstImageURL(page, newListUrl);
+      const newListUrl = `${listPageUrl}?nw=always`;
+      [url, error] = await getFirstImageURL(page, newListUrl, startImageCount);
       if (error !== undefined) {
         throw error;
       }
@@ -38,9 +41,10 @@ export async function scrapeImages(listUrl: string, directory: string): Promise<
   }
 }
 
-async function getFirstImageURL(page: Page, listUrl: string): Promise<[string, Error | undefined]> {
+async function getFirstImageURL(page: Page, listUrl: string, imageCount: number): Promise<[string, Error | undefined]> {
   const response = await page.goto(listUrl, { waitUntil: "networkidle2" });
-  const firstImage = await page.$("#gdt a");
+  const imageAnchorList = await page.$$("#gdt a");
+  const firstImage = imageAnchorList[imageCount];
   const hrefProperty = await firstImage?.getProperty("href");
   if (hrefProperty === undefined) {
     const chain = response?.request().redirectChain();
