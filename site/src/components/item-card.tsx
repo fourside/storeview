@@ -5,6 +5,7 @@ import styles from "./item-card.module.css";
 
 type ItemCardProps = {
   item: Item;
+  count: number;
   isActive: boolean;
   pinned: boolean;
   queueing: boolean;
@@ -38,15 +39,18 @@ export const ItemCard: FC<ItemCardProps> = (props) => {
       data-pinned={props.pinned || undefined}
       ref={ref}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`/api/images?item_id=${props.item.id}`}
-        loading="lazy"
-        width="200"
-        height="350"
-        className={styles.image}
-        alt={props.item.title}
-      />
+      <div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/api/images?item_id=${props.item.id}`}
+          loading="lazy"
+          width="200"
+          height="350"
+          className={styles.image}
+          alt={props.item.title}
+        />
+        <span className={styles.count}>{props.count}</span>
+      </div>
       <div>
         <div className={styles.header}>
           <span

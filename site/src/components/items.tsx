@@ -171,6 +171,7 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
           <ItemCard
             key={item.id}
             item={item}
+            count={index + 1}
             isActive={index === activeIndex}
             pinned={pinnedItems.some((it) => it.id === item.id)}
             queueing={queueing && item === enqueuedItem}
