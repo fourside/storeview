@@ -6,7 +6,7 @@ export default async function handler(
   res: Pick<NextApiResponse, "status">
 ): Promise<void> {
   if (req.method !== "GET") {
-    res.status(405);
+    res.status(405).end();
     return;
   }
   const { page } = parseQuery(req.query);

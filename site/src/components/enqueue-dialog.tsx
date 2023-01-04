@@ -8,7 +8,7 @@ import styles from "./enqueue-dialog.module.css";
 
 type EnqueueDialogProps = {
   item: Item;
-  onEnqueue: (param: { directory: string; url: string }) => void;
+  onEnqueue: (param: { directory: string; url: string; itemId: string }) => void;
   onClose: () => void;
 };
 
@@ -35,9 +35,9 @@ export const EnqueueDialog: FC<EnqueueDialogProps> = (props) => {
       if (validationMessage.directory !== "" || validationMessage.url !== "") {
         throw new Error("disabled attribute not work");
       }
-      onEnqueue({ directory, url });
+      onEnqueue({ directory, url, itemId: props.item.id });
     },
-    [directory, onEnqueue, url, validationMessage]
+    [directory, onEnqueue, props.item.id, url, validationMessage.directory, validationMessage.url]
   );
 
   useEffect(() => {

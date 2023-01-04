@@ -1,0 +1,87 @@
+.overlay {
+  background-color: #090909ee;
+  position: fixed;
+  inset: 0;
+}
+
+.content {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 90vw;
+  min-height: 35vh;
+  max-height: 75vh;
+  transform: translate(-50%, -50%);
+  padding: 32px;
+
+  overflow-y: auto;
+}
+
+.content:focus {
+  outline: none;
+}
+
+.header {
+  padding: 8px 0;
+}
+
+.body {
+  padding: 8px 0;
+}
+
+.title {
+  margin: 0;
+  font-weight: 500;
+  color: var(--mauve12);
+  font-size: 17px;
+}
+
+.closeButton {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background-color: #eee;
+}
+
+.progressContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.progressRoot {
+  position: relative;
+  overflow: hidden;
+  background-color: #333;
+  border-radius: 99999px;
+  width: 100%;
+  height: 25px;
+
+  /* Fix overflow clipping in Safari */
+  /* https://gist.github.com/domske/b66047671c780a238b51c51ffde8d3a0 */
+  transform: translateZ(0);
+}
+
+.progressIndicator {
+  background-color: #ddd;
+  width: 100%;
+  height: 100%;
+  transition: transform 660ms cubic-bezier(0.65, 0, 0.35, 1);
+}

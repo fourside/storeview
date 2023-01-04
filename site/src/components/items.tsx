@@ -3,15 +3,18 @@
 import { Item } from "@prisma/client";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { fetchItems, postQueue } from "../fetch-client";
+import { ProgressData } from "../type";
 import { useIntersectionObserver } from "../use-intersection-observer";
 import { EnqueueDialog } from "./enqueue-dialog";
 import { ItemCard } from "./item-card";
 import styles from "./items.module.css";
 import { Loader } from "./loader";
+import { ProgressDialog } from "./progress-dialog";
 import { useToaster } from "./toaster";
 
 type ItemsComponentProps = {
   items: Item[];
+  progressDataList: ProgressData[];
 };
 
 export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
@@ -28,6 +31,8 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
   const { showSuccess, showFailure, Toaster } = useToaster();
 
   const prevKeyRef = useRef<string>();
+
+  const [showProgress, setShowProgress] = useState(false);
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -134,7 +139,7 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
   }, []);
 
   const handleEnqueue = useCallback(
-    async (param: { directory: string; url: string }) => {
+    async (param: { directory: string; url: string; itemId: string }) => {
       setQueueing(true);
       try {
         setEnqueuedItem(undefined);
@@ -150,8 +155,17 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
     [showFailure, showSuccess]
   );
 
+  const handleShowProgress = useCallback(() => {
+    setShowProgress(true);
+  }, []);
+
+  const handleCloseProgress = useCallback(() => {
+    setShowProgress(false);
+  }, []);
+
   return (
     <div className={styles.container}>
+      <button onClick={handleShowProgress}>show progress</button>
       <div className={styles.grid}>
         {items.map((item, index) => (
           <ItemCard
@@ -172,6 +186,7 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
       {enqueuedItem !== undefined && (
         <EnqueueDialog item={enqueuedItem} onEnqueue={handleEnqueue} onClose={handleEnqueueModalClose} />
       )}
+      {showProgress && <ProgressDialog onClose={handleCloseProgress} progressList={props.progressDataList} />}
       {Toaster}
       {loading && <Loader />}
       <div ref={observedRef} />
