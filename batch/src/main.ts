@@ -61,8 +61,7 @@ async function subscribe(dbClient: PrismaClient): Promise<void> {
   for (const queue of queueList) {
     try {
       const directory = path.join("../data/", queue.directory);
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      fs.mkdir(directory, () => {});
+      fs.mkdirSync(directory);
       const imageCount = fs.readdirSync(directory).length;
       await scrapeImages(queue.url, directory, imageCount);
       await dequeue(dbClient, queue);
