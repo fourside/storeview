@@ -17,7 +17,7 @@ export async function scrapeImages(listUrl: string, directory: string, imageCoun
 
   try {
     const page = await browser.newPage();
-    const pageCount = imageCount / 40;
+    const pageCount = Math.floor(imageCount / 40) - 1;
     const listPageUrl = pageCount === 0 ? listUrl : `${listUrl}?p=${pageCount}`;
     const startImageCount = imageCount % 40;
     let [url, error] = await getFirstImageURL(page, listPageUrl, startImageCount);
