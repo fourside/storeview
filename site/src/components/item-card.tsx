@@ -56,7 +56,7 @@ export const ItemCard: FC<ItemCardProps> = (props) => {
           <span
             className={styles.category}
             style={{
-              backgroundColor: labelColor(props.item.category.length),
+              backgroundColor: labelColor(props.item.category),
             }}
           >
             {props.item.category}
@@ -75,11 +75,14 @@ export const ItemCard: FC<ItemCardProps> = (props) => {
   );
 };
 
-function labelColor(num: number): string {
-  if (num > 8) {
+function labelColor(str: string): string {
+  if (str.length > 8) {
+    if (str.includes(" ")) {
+      return "#dddd00";
+    }
     return "#f09010";
   }
-  if (num > 6) {
+  if (str.length > 6) {
     return "#7700bb";
   }
   return "#ff6050";
