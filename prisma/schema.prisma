@@ -17,6 +17,7 @@ model Item {
   category    String
   totalPage   Int    @default(0)
   publishedAt String
+  removed     Boolean @default(false)
   Image       Image?
   Queue       Queue?
 }
