@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import fs from "node:fs";
 import path from "node:path";
-import { closeClient, dequeue, getClient, getLatestData, getQueueData, saveItemsAndImages } from "./db";
+import { closeClient, dequeue, getClient, getLatestData, getQueueData, removeItem, saveItemsAndImages } from "./db";
 import { Env } from "./env";
 import { fetchImages } from "./http";
 import { RemovedError } from "./removed-error";
@@ -72,6 +72,9 @@ async function subscribe(dbClient: PrismaClient): Promise<void> {
       if (error instanceof RemovedError) {
         console.error("removed", queue);
         await dequeue(dbClient, queue);
+        if (queue.itemId !== undefined) {
+          await removeItem(dbClient, queue.itemId);
+        }
         continue;
       }
       console.error(error);

@@ -49,6 +49,17 @@ export async function saveItemsAndImages(client: PrismaClient, items: ItemData[]
   ]);
 }
 
+export async function removeItem(client: PrismaClient, itemId: string): Promise<void> {
+  await client.item.update({
+    where: {
+      id: itemId,
+    },
+    data: {
+      removed: true,
+    },
+  });
+}
+
 export async function getQueueData(client: PrismaClient): Promise<QueueData[]> {
   const queueDataList = await client.queue.findMany({
     where: {
@@ -59,12 +70,15 @@ export async function getQueueData(client: PrismaClient): Promise<QueueData[]> {
       Item: true,
     },
   });
-  return queueDataList.map((it) => ({
-    id: it.id,
-    directory: it.directory,
-    url: it.url,
-    totalPage: it.Item?.totalPage ?? 0,
-  }));
+  return queueDataList
+    .filter((it) => it.Item?.removed === false)
+    .map((it) => ({
+      id: it.id,
+      directory: it.directory,
+      url: it.url,
+      totalPage: it.Item?.totalPage ?? 0,
+      itemId: it.Item?.id,
+    }));
 }
 
 export async function dequeue(client: PrismaClient, queueData: QueueData): Promise<void> {
