@@ -11,11 +11,11 @@ datasource db {
 }
 
 model Item {
-  id          String @id
+  id          String  @id
   title       String
   url         String
   category    String
-  totalPage   Int    @default(0)
+  totalPage   Int     @default(0)
   publishedAt String
   removed     Boolean @default(false)
   Image       Image?
@@ -42,4 +42,10 @@ model Queue {
   Item      Item?    @relation(fields: [itemId], references: [id])
   createdAt DateTime
   updatedAt DateTime
+}
+
+model NotReadCount {
+  id         Int      @id @default(autoincrement())
+  count      Int
+  lastReadAt DateTime
 }
