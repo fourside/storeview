@@ -1,4 +1,4 @@
-import { Image, Item, NotReadCount, PrismaClient, Queue } from "@prisma/client";
+import { Image, Item, NotReadCount, PrismaClient, Queue } from "prisma";
 
 const prisma = new PrismaClient();
 
