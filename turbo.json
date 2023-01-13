@@ -1,0 +1,23 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "items": {
+      "outputs": []
+    },
+    "subscribe": {
+      "outputs": []
+    },
+    "dev": {
+      "outputs": []
+    },
+    "lint": {
+      "outputs": []
+    },
+    "check": {
+      "outputs": []
+    },
+    "test": {
+      "outputs": []
+    }
+  }
+}

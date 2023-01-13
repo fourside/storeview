@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "items": "npm run items -w batch",
-    "subscribe": "npm run subscribe -w batch",
-    "dev": "npm run dev -w site",
-    "lint": "npm run --workspaces lint",
-    "test": "npm run --workspaces test",
-    "check": "npm run --workspaces check",
+    "items": "turbo run items",
+    "subscribe": "turbo run subscribe",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "check": "turbo run check",
     "prepare": "husky install"
   },
   "keywords": [],
@@ -22,6 +22,7 @@
     "husky": "^8.0.2",
     "prettier": "^2.8.1",
     "prisma": "^4.8.0",
+    "turbo": "^1.7.0",
     "typescript": "^4.9.4"
   },
   "dependencies": {
