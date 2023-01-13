@@ -3,3 +3,8 @@ export type ProgressData = {
   progress: number;
   total: number;
 };
+
+export type NotReadCountData = {
+  count: number;
+  lastReadAt: string;
+};

@@ -1,4 +1,4 @@
-import { Image, Item, PrismaClient, Queue } from "@prisma/client";
+import { Image, Item, NotReadCount, PrismaClient, Queue } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -45,6 +45,20 @@ export async function getQueueList(): Promise<QueueWithItem[]> {
     orderBy: [{ id: "desc" }],
     include: {
       Item: true,
+    },
+  });
+}
+
+export async function getNotReadCount(): Promise<NotReadCount | undefined> {
+  const notReadCount = await prisma.notReadCount.findFirst();
+  return notReadCount ?? undefined;
+}
+
+export async function readAll(): Promise<void> {
+  await prisma.notReadCount.updateMany({
+    data: {
+      count: 0,
+      lastReadAt: new Date(),
     },
   });
 }

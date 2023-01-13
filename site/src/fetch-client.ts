@@ -18,6 +18,7 @@ const itemResponse = z.array(
     title: z.string(),
     url: z.string(),
     category: z.string(),
+    removed: z.boolean(),
     totalPage: z.number(),
     publishedAt: z.string(),
   })
@@ -57,3 +58,9 @@ const getProgressDataListResponse = z.array(
     total: z.number(),
   })
 );
+
+export async function putReadAll(): Promise<void> {
+  await fetch("/api/not_read_count", {
+    method: "PUT",
+  });
+}

@@ -9,11 +9,13 @@ type ItemCardProps = {
   isActive: boolean;
   pinned: boolean;
   queueing: boolean;
+  isLast: boolean; // TODO: naming
   onEnqueueModalOpen: (item: Item) => void;
+  onReachLast: (item: Item) => void;
 };
 
 export const ItemCard: FC<ItemCardProps> = (props) => {
-  const { onEnqueueModalOpen } = props;
+  const { onEnqueueModalOpen, onReachLast } = props;
   const ref = useRef<HTMLAnchorElement>(null);
 
   const handleClick = useCallback(
@@ -30,6 +32,12 @@ export const ItemCard: FC<ItemCardProps> = (props) => {
       ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }, [props.isActive]);
+
+  useEffect(() => {
+    if (props.isLast) {
+      onReachLast(props.item);
+    }
+  }, [onReachLast, props.isLast, props.item]);
 
   return (
     <a

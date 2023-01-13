@@ -29,3 +29,25 @@
   padding: 0 12px;
   font-size: xx-large;
 }
+
+.notReadCard {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1;
+  border-radius: 8px;
+  background-color: #c9c9c9;
+  opacity: 0.9;
+  width: 200px;
+  padding: 12px;
+}
+
+.notReadCard strong {
+  padding: 0 4px;
+  font-size: x-large;
+}
+
+.notReadCardLabel {
+  padding-right: 4px;
+  font-size: small;
+}

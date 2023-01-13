@@ -2,8 +2,8 @@
 
 import { Item } from "@prisma/client";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
-import { fetchItems, postQueue } from "../fetch-client";
-import { ProgressData } from "../type";
+import { fetchItems, postQueue, putReadAll } from "../fetch-client";
+import { NotReadCountData, ProgressData } from "../type";
 import { useIntersectionObserver } from "../use-intersection-observer";
 import { EnqueueDialog } from "./enqueue-dialog";
 import { ItemCard } from "./item-card";
@@ -15,6 +15,7 @@ import { useToaster } from "./toaster";
 type ItemsComponentProps = {
   items: Item[];
   progressDataList: ProgressData[];
+  notReadCountData: NotReadCountData;
 };
 
 export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
@@ -163,8 +164,29 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
     setShowProgress(false);
   }, []);
 
+  const handleReachLast = useCallback(async (lastItem: Item) => {
+    try {
+      await putReadAll();
+      console.log("last read", lastItem);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   return (
     <div className={styles.container}>
+      <div className={styles.notReadCard}>
+        <div>
+          <span className={styles.notReadCardLabel}>newly added</span>
+          <span>
+            <strong>{props.notReadCountData.count}</strong>
+          </span>
+        </div>
+        <div>
+          <span className={styles.notReadCardLabel}>since</span>
+          <span>{props.notReadCountData.lastReadAt}</span>
+        </div>
+      </div>
       <button onClick={handleShowProgress}>show progress</button>
       <div className={styles.grid}>
         {items.map((item, index) => (
@@ -175,7 +197,9 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
             isActive={index === activeIndex}
             pinned={pinnedItems.some((it) => it.id === item.id)}
             queueing={queueing && item === enqueuedItem}
+            isLast={props.notReadCountData.count === activeIndex}
             onEnqueueModalOpen={handleEnqueueModalOpen}
+            onReachLast={handleReachLast}
           />
         ))}
       </div>

@@ -1,7 +1,8 @@
+import { NotReadCount } from "@prisma/client";
 import fs from "node:fs";
 import path from "node:path";
 import { QueueWithItem } from "./db";
-import { ProgressData } from "./type";
+import { NotReadCountData, ProgressData } from "./type";
 
 export function convertQueueToProgress(queue: QueueWithItem): ProgressData {
   if (queue.dequeued) {
@@ -18,5 +19,18 @@ export function convertQueueToProgress(queue: QueueWithItem): ProgressData {
     directory: queue.directory,
     progress,
     total,
+  };
+}
+
+export function convertNotReadCount(notReadCount: NotReadCount | undefined): NotReadCountData {
+  if (notReadCount === undefined) {
+    return { count: 0, lastReadAt: "not read yet" };
+  }
+  return {
+    count: notReadCount.count,
+    lastReadAt:
+      notReadCount.lastReadAt.getTime() === new Date(Date.UTC(1970, 0)).getTime()
+        ? "not read yet"
+        : notReadCount.lastReadAt.toISOString(),
   };
 }

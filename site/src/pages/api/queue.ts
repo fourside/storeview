@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
-import fs from "node:fs";
-import path from "node:path";
 import { createQueue, getQueueList } from "../../db";
 import { convertQueueToProgress } from "../../converter";
 import { ProgressData } from "../../type";
