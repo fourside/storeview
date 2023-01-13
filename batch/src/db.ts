@@ -94,3 +94,24 @@ export async function dequeue(client: PrismaClient, queueData: QueueData): Promi
     }),
   ]);
 }
+
+export async function incrementNotReadCount(client: PrismaClient, count: number): Promise<void> {
+  const notReadCount = await client.notReadCount.findFirst();
+  if (notReadCount === null) {
+    await client.notReadCount.create({
+      data: {
+        count: count,
+        lastReadAt: new Date(Date.UTC(1970, 0)),
+      },
+    });
+  } else {
+    await client.notReadCount.update({
+      where: {
+        id: notReadCount.id,
+      },
+      data: {
+        count: notReadCount.count + count,
+      },
+    });
+  }
+}

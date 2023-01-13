@@ -1,7 +1,16 @@
 import { PrismaClient } from "@prisma/client";
 import fs from "node:fs";
 import path from "node:path";
-import { closeClient, dequeue, getClient, getLatestData, getQueueData, removeItem, saveItemsAndImages } from "./db";
+import {
+  closeClient,
+  dequeue,
+  getClient,
+  getLatestData,
+  getQueueData,
+  incrementNotReadCount,
+  removeItem,
+  saveItemsAndImages,
+} from "./db";
 import { Env } from "./env";
 import { fetchImages } from "./http";
 import { RemovedError } from "./removed-error";
@@ -52,6 +61,7 @@ async function scrapeItemsAndImages(dbClient: PrismaClient): Promise<void> {
   }
   const images = await fetchImages(items);
   await saveItemsAndImages(dbClient, items, images);
+  await incrementNotReadCount(dbClient, items.length);
   console.log("\ndone", new Date());
 }
 
