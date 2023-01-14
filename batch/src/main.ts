@@ -13,6 +13,7 @@ import {
 } from "./db";
 import { Env } from "./env";
 import { fetchImages } from "./http";
+import { itemsLogger, rootLogger, subscribeLogger } from "./logger";
 import { RemovedError } from "./removed-error";
 import { scrapeImages } from "./scrape-images";
 import { scrapeItems } from "./scrape-items";
@@ -30,11 +31,11 @@ async function main(args: string[]): Promise<void> {
         dbClient = getClient();
         return await subscribe(dbClient);
       default:
-        console.error("pass subcommand, items or subscribe");
+        rootLogger.error("pass subcommand, items or subscribe");
         process.exit(-1);
     }
   } catch (error) {
-    console.error(error);
+    rootLogger.error(error);
     process.exit(-1);
   } finally {
     if (dbClient !== undefined) {
@@ -51,18 +52,18 @@ if (process.argv[1] === __filename) {
 }
 
 async function scrapeItemsAndImages(dbClient: PrismaClient): Promise<void> {
-  console.log("start", new Date());
+  itemsLogger.info("start", new Date());
   const latestData = await getLatestData(dbClient);
 
   const items = await scrapeItems(Env.targetUrl, latestData);
-  console.log("scraped count: ", items.length);
+  itemsLogger.info(`scraped count: ${items.length}`);
   if (items.length === 0) {
     return;
   }
   const images = await fetchImages(items);
   await saveItemsAndImages(dbClient, items, images);
   await incrementNotReadCount(dbClient, items.length);
-  console.log("\ndone", new Date());
+  itemsLogger.info("\ndone", new Date());
 }
 
 async function subscribe(dbClient: PrismaClient): Promise<void> {
@@ -80,15 +81,14 @@ async function subscribe(dbClient: PrismaClient): Promise<void> {
       await sleep(1000 * 10);
     } catch (error) {
       if (error instanceof RemovedError) {
-        console.error("removed", queue);
+        subscribeLogger.error("removed", queue);
         await dequeue(dbClient, queue);
         if (queue.itemId !== undefined) {
           await removeItem(dbClient, queue.itemId);
         }
         continue;
       }
-      console.error(error);
-      console.log("caused queue:", queue);
+      subscribeLogger.error(error, "caused queue is ", queue);
     }
   }
 

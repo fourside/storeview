@@ -2,6 +2,7 @@ import fs from "node:fs";
 import puppeteer, { Page } from "puppeteer-core";
 import { LatestData } from "./db";
 import { Env } from "./env";
+import { itemsLogger } from "./logger";
 import { sleep } from "./sleep";
 import { ItemData } from "./type";
 
@@ -55,8 +56,7 @@ async function scrapePage(page: Page, latest: LatestData): Promise<ItemData[]> {
       await Promise.all([page.waitForNavigation({ waitUntil: "networkidle2" }), page.click("#dnext")]);
       pageCount++;
       if (!Env.production) {
-        console.clear();
-        console.log(`${pageCount} page`);
+        itemsLogger.info(`${pageCount} page`);
       }
 
       await sleep(3500);
@@ -67,7 +67,7 @@ async function scrapePage(page: Page, latest: LatestData): Promise<ItemData[]> {
         }
         retryAttempt++;
       }
-      console.log("page url: ", page.url());
+      itemsLogger.warn(`error caused page: ${page.url()}`);
       throw error;
     } finally {
       // in case of failure of subsequence db process

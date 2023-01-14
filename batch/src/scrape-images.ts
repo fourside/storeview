@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import puppeteer, { Page } from "puppeteer-core";
 import { Env } from "./env";
+import { subscribeLogger } from "./logger";
 import { RemovedError } from "./removed-error";
 import { sleep } from "./sleep";
 
@@ -101,7 +102,7 @@ async function scrapePage(page: Page, directory: string, totalPage: number): Pro
         }
         retryAttempt++;
       }
-      console.log("page url: ", page.url());
+      subscribeLogger.warn(`error caused page: ${page.url()}`);
       throw error;
     }
   }

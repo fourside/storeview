@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "cli-progress": "^3.11.2",
+    "pino": "^8.8.0",
     "puppeteer-core": "^19.4.0"
   },
   "devDependencies": {
