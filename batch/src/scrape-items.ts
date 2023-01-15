@@ -42,7 +42,6 @@ async function scrapePage(page: Page, latest: LatestData): Promise<ItemData[]> {
     }
   );
 
-  let pageCount = 0;
   let retryAttempt = 0;
   const retryLimit = 5;
   // eslint-disable-next-line no-constant-condition
@@ -54,11 +53,6 @@ async function scrapePage(page: Page, latest: LatestData): Promise<ItemData[]> {
         break;
       }
       await Promise.all([page.waitForNavigation({ waitUntil: "networkidle2" }), page.click("#dnext")]);
-      pageCount++;
-      if (!Env.production) {
-        itemsLogger.info(`${pageCount} page`);
-      }
-
       await sleep(3500);
     } catch (error) {
       if (error instanceof Error && error.name === "TimeoutError") {
