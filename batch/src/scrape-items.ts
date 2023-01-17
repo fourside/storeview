@@ -2,7 +2,6 @@ import fs from "node:fs";
 import puppeteer, { Page } from "puppeteer-core";
 import { LatestData } from "./db";
 import { Env } from "./env";
-import { itemsLogger } from "./logger";
 import { sleep } from "./sleep";
 import { ItemData } from "./type";
 
@@ -42,33 +41,38 @@ async function scrapePage(page: Page, latest: LatestData): Promise<ItemData[]> {
     }
   );
 
-  let retryAttempt = 0;
-  const retryLimit = 5;
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    try {
-      const result = await generator.next();
-      items.push(...result.value);
-      if (result.done) {
-        break;
-      }
-      await Promise.all([page.waitForNavigation({ waitUntil: "networkidle2" }), page.click("#dnext")]);
-      await sleep(3500);
-    } catch (error) {
-      if (error instanceof Error && error.name === "TimeoutError") {
-        if (retryAttempt > retryLimit) {
-          throw new Error(`exceeded max retry [${retryAttempt}]`);
+  try {
+    return await timeoutRetry<ItemData[]>(async () => {
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const result = await generator.next();
+        items.push(...result.value);
+        if (result.done) {
+          break;
         }
-        retryAttempt++;
+        await Promise.all([page.waitForNavigation({ waitUntil: "networkidle2" }), page.click("#dnext")]);
+        await sleep(3500);
       }
-      itemsLogger.warn(`error caused page: ${page.url()}`);
-      throw error;
-    } finally {
-      // in case of failure of subsequence db process
-      fs.writeFileSync("./items.json", JSON.stringify(items, null, 2));
-    }
+      return items;
+    });
+  } finally {
+    // in case of failure of subsequence db process
+    fs.writeFileSync("./items.json", JSON.stringify(items, null, 2));
   }
-  return items;
+}
+
+async function timeoutRetry<T>(asyncCallback: () => Promise<T>, attempt = 1, limit = 5): Promise<T> {
+  try {
+    return await asyncCallback();
+  } catch (error) {
+    if (error instanceof Error && error.name === "TimeoutError") {
+      if (attempt > limit) {
+        throw new Error(`exceeded max retry [${limit}]`);
+      }
+      await timeoutRetry(asyncCallback, ++attempt, limit);
+    }
+    throw error;
+  }
 }
 
 async function* loopUntilGenerator(
