@@ -1,6 +1,7 @@
 import { NotReadCount } from "@prisma/client";
 import fs from "node:fs";
 import path from "node:path";
+import { dateFormat } from "./date-format";
 import { QueueWithItem } from "./db";
 import { NotReadCountData, ProgressData } from "./type";
 
@@ -31,6 +32,6 @@ export function convertNotReadCount(notReadCount: NotReadCount | undefined): Not
     lastReadAt:
       notReadCount.lastReadAt.getTime() === new Date(Date.UTC(1970, 0)).getTime()
         ? "not read yet"
-        : notReadCount.lastReadAt.toISOString(),
+        : dateFormat(notReadCount.lastReadAt),
   };
 }
