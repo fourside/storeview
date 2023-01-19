@@ -12,6 +12,8 @@
     "check": "turbo run check",
     "db:migrate:dev": "turbo run db:migrate:dev",
     "db:generate": "turbo run db:generate",
+    "db:validate": "turbo run db:validate",
+    "db:format": "turbo run db:format",
     "prepare": "husky install"
   },
   "keywords": [],
@@ -27,12 +29,11 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "dotenv": "^16.0.3",
-    "prisma": "*"
+    "dotenv": "^16.0.3"
   },
   "workspaces": [
-    "prisma",
     "batch",
+    "orm",
     "site"
   ],
   "prettier": {

@@ -2,7 +2,8 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "items": {
-      "outputs": []
+      "outputs": [],
+      "cache": false
     },
     "subscribe": {
       "outputs": []
@@ -28,6 +29,14 @@
       "cache": false
     },
     "db:generate": {
+      "cache": false
+    },
+    "db:validate": {
+      "outputs": [],
+      "cache": false
+    },
+    "db:format": {
+      "outputs": [],
       "cache": false
     }
   }

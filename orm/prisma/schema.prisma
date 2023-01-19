@@ -11,15 +11,16 @@ datasource db {
 }
 
 model Item {
-  id          String  @id
-  title       String
-  url         String
-  category    String
-  totalPage   Int     @default(0)
-  publishedAt String
-  removed     Boolean @default(false)
-  Image       Image?
-  Queue       Queue?
+  id                String  @id
+  title             String
+  url               String
+  category          String
+  totalPage         Int     @default(0)
+  publishedAt       String
+  removed           Boolean @default(false)
+  thumbnailFileName String
+  Image             Image?
+  Queue             Queue?
 }
 
 model Image {
