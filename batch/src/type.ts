@@ -5,12 +5,15 @@ export type ItemData = {
   category: string;
   totalPage: number;
   publishedAt: string;
+  thumbnailFileName: string;
   imageUrl: string;
 };
 
 export type ImageData = {
   itemId: string;
   image: Buffer;
+  fileName: string;
+  mimeType: string;
 };
 
 export type QueueData = {

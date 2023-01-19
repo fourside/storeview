@@ -14,6 +14,7 @@ import {
 import { Env } from "./env";
 import { fetchImages } from "./http";
 import { itemsLogger, rootLogger, subscribeLogger } from "./logger";
+import { uploadImagesToR2 } from "./r2-client";
 import { RemovedError } from "./removed-error";
 import { scrapeImages } from "./scrape-images";
 import { scrapeItems } from "./scrape-items";
@@ -62,6 +63,7 @@ async function scrapeItemsAndImages(dbClient: PrismaClient): Promise<void> {
   }
   const images = await fetchImages(items);
   await saveItemsAndImages(dbClient, items, images);
+  await uploadImagesToR2(images);
   await incrementNotReadCount(dbClient, items.length);
   itemsLogger.info("\ndone", new Date());
 }

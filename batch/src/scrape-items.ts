@@ -103,6 +103,12 @@ async function scrapeRows(page: Page): Promise<ItemData[]> {
       }
     }
 
+    function formatFilename(itemId: string, imageUrl: string): string {
+      const name = itemId.slice(1, -1).replace("/", "_");
+      const ext = imageUrl.split(".").pop();
+      return `${name}.${ext}`;
+    }
+
     return Array.from(rows).flatMap((row, index) => {
       if (index === 0) {
         return [];
@@ -132,8 +138,9 @@ async function scrapeRows(page: Page): Promise<ItemData[]> {
 
       const url = new URL(urlString);
       const id = url.pathname.slice(2);
+      const thumbnailFileName = formatFilename(id, imageUrl);
 
-      return [{ id, title, url: urlString, category, totalPage, publishedAt, imageUrl }];
+      return [{ id, title, url: urlString, category, totalPage, publishedAt, thumbnailFileName, imageUrl }];
     });
   }, trSelector);
 }

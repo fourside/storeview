@@ -1,5 +1,5 @@
-import { PrismaClient } from "prisma";
-import { ItemData, ImageData, QueueData } from "./type";
+import { PrismaClient } from "orm";
+import type { ItemData, ImageData, QueueData } from "./type";
 
 export type LatestData = {
   id: string;
@@ -32,11 +32,15 @@ export async function saveItemsAndImages(client: PrismaClient, items: ItemData[]
         category: it.category,
         totalPage: it.totalPage,
         publishedAt: it.publishedAt,
+        thumbnailFileName: it.thumbnailFileName,
       })),
       skipDuplicates: true,
     }),
     client.image.createMany({
-      data: images,
+      data: images.map((it) => ({
+        image: it.image,
+        itemId: it.itemId,
+      })),
       skipDuplicates: true,
     }),
     client.latest.deleteMany(),

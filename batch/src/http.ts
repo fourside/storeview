@@ -1,5 +1,5 @@
 import { sleep } from "./sleep";
-import { ItemData, ImageData } from "./type";
+import type { ItemData, ImageData } from "./type";
 
 export async function fetchImages(items: ItemData[]): Promise<ImageData[]> {
   const imageDataList: ImageData[] = [];
@@ -11,6 +11,8 @@ export async function fetchImages(items: ItemData[]): Promise<ImageData[]> {
     imageDataList.push({
       itemId: item.id,
       image,
+      mimeType: res.headers.get("content-type") ?? "image/jpeg",
+      fileName: item.thumbnailFileName,
     });
     await sleep(2000);
   }
