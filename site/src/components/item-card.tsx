@@ -1,6 +1,7 @@
 import { Item } from "@prisma/client";
 import Image from "next/image";
 import { FC, MouseEvent, useCallback, useEffect, useRef } from "react";
+import { Env } from "../env";
 import styles from "./item-card.module.css";
 
 type ItemCardProps = {
@@ -50,7 +51,7 @@ export const ItemCard: FC<ItemCardProps> = (props) => {
       <div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={`/api/images?item_id=${props.item.id}`}
+          src={`${Env.thumbnailHost}/${props.item.thumbnailFileName}`}
           loading="lazy"
           width="200"
           height="350"

@@ -1,4 +1,4 @@
-import { Image, Item, NotReadCount, PrismaClient, Queue } from "prisma";
+import { Image, Item, NotReadCount, PrismaClient, Queue } from "orm";
 
 const prisma = new PrismaClient();
 
