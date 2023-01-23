@@ -46,6 +46,9 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
         // not capture key event in modal except esc
         return;
       }
+      if (event.key === "s") {
+        setShowProgress((prev) => !prev);
+      }
       if (event.key === "g" && prevKeyRef.current === "g") {
         setActiveIndex(0);
       }
