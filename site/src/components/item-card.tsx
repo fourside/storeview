@@ -46,6 +46,8 @@ export const ItemCard: FC<ItemCardProps> = (props) => {
       className={styles.container}
       data-active={props.isActive || undefined}
       data-pinned={props.pinned || undefined}
+      target="_blank"
+      rel="noreferrer"
       ref={ref}
     >
       <div>
