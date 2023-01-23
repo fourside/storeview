@@ -22,4 +22,5 @@ export type QueueData = {
   directory: string;
   totalPage: number;
   itemId?: string;
+  archiveUrl?: string;
 };

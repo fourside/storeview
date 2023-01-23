@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import fs from "node:fs";
 import path from "node:path";
+import { archive } from "./archive";
 import {
   closeClient,
   dequeue,
@@ -14,7 +15,7 @@ import {
 import { Env } from "./env";
 import { fetchImages } from "./http";
 import { itemsLogger, rootLogger, subscribeLogger } from "./logger";
-import { uploadImagesToR2 } from "./r2-client";
+import { uploadImagesToR2, uploadZipToR2 } from "./r2-client";
 import { RemovedError } from "./removed-error";
 import { scrapeImages } from "./scrape-images";
 import { scrapeItems } from "./scrape-items";
@@ -79,6 +80,9 @@ async function subscribe(dbClient: PrismaClient): Promise<void> {
       }
       const imageCount = fs.readdirSync(directory).length;
       await scrapeImages(queue.url, directory, imageCount);
+      const { fileName, zip } = await archive(directory);
+      const { bucketKey } = await uploadZipToR2(fileName, zip);
+      queue.archiveUrl = bucketKey;
       await dequeue(dbClient, queue);
       await sleep(1000 * 10);
     } catch (error) {

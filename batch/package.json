@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/main.ts",
   "scripts": {
+    "zip": "ts-node src/archiver.ts",
     "items": "ts-node src/main.ts items",
     "subscribe": "ts-node src/main.ts subscribe",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.252.0",
+    "jszip": "^3.10.1",
     "orm": "*",
     "pino": "^8.8.0",
     "puppeteer-core": "^19.4.0"

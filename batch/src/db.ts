@@ -93,6 +93,7 @@ export async function dequeue(client: PrismaClient, queueData: QueueData): Promi
       },
       data: {
         dequeued: true,
+        archiveUrl: queueData.archiveUrl,
         updatedAt: new Date(),
       },
     }),
