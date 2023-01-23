@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
+    "db:migrate:dev": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:format": "prisma format",
     "db:validate": "prisma validate"
