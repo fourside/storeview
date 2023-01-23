@@ -21,6 +21,7 @@ const itemResponse = z.array(
     removed: z.boolean(),
     totalPage: z.number(),
     publishedAt: z.string(),
+    thumbnailFileName: z.string(),
   })
 );
 
