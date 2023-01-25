@@ -20,6 +20,8 @@ type ItemsComponentProps = {
 
 export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
   const [items, setItems] = useState(props.items);
+  const [notReadCountData, setNotReadCountData] = useState(props.notReadCountData);
+
   const [loading, setLoading] = useState(false);
   const [reachedLast, setReachedLast] = useState(false);
   const nextPageRef = useRef(1);
@@ -167,14 +169,27 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
     setShowProgress(false);
   }, []);
 
-  const handleReachLast = useCallback(async (lastItem: Item) => {
-    try {
-      await putReadAll();
-      console.log("last read", lastItem);
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
+  const requesting = useRef(false);
+
+  const handleReachLast = useCallback(
+    async (lastItem: Item) => {
+      if (requesting.current || notReadCountData.count === 0) {
+        return;
+      }
+      requesting.current = true;
+      try {
+        await putReadAll();
+        setNotReadCountData({ count: 0, lastReadAt: "now" });
+        showSuccess("reached last");
+        console.log("last read", lastItem);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        requesting.current = false;
+      }
+    },
+    [notReadCountData.count, showSuccess]
+  );
 
   return (
     <div className={styles.container}>
@@ -182,12 +197,12 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
         <div>
           <span className={styles.notReadCardLabel}>newly added</span>
           <span>
-            <strong>{props.notReadCountData.count}</strong>
+            <strong>{notReadCountData.count}</strong>
           </span>
         </div>
         <div>
           <span className={styles.notReadCardLabel}>since</span>
-          <span>{props.notReadCountData.lastReadAt}</span>
+          <span>{notReadCountData.lastReadAt}</span>
         </div>
       </div>
       <button onClick={handleShowProgress}>show progress</button>
@@ -200,7 +215,7 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
             isActive={index === activeIndex}
             pinned={pinnedItems.some((it) => it.id === item.id)}
             queueing={queueing && item === enqueuedItem}
-            isLast={props.notReadCountData.count === activeIndex}
+            isLast={activeIndex !== 0 ? notReadCountData.count === activeIndex : false}
             onEnqueueModalOpen={handleEnqueueModalOpen}
             onReachLast={handleReachLast}
           />
