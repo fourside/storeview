@@ -1,4 +1,4 @@
-import { S3, PutObjectCommand, type PutObjectCommandInput, type DeleteObjectCommandInput } from "@aws-sdk/client-s3";
+import { S3, PutObjectCommand, type PutObjectCommandInput } from "@aws-sdk/client-s3";
 import { Env } from "./env";
 import type { ImageData } from "./type";
 
@@ -18,7 +18,7 @@ export async function uploadImagesToR2(images: ImageData[]): Promise<void> {
 
 export async function uploadZipToR2(fileName: string, zip: Buffer): Promise<{ bucketKey: string }> {
   const r2Client = createR2Client();
-  const bucket = `${Env.cloudflareBucketName}/archives`;
+  const bucket = Env.cloudflareBucketName;
   const input: PutObjectCommandInput = {
     Bucket: bucket,
     Key: fileName,
