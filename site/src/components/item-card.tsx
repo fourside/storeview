@@ -23,6 +23,9 @@ export const ItemCard: FC<ItemCardProps> = (props) => {
     (event: MouseEvent) => {
       event.stopPropagation();
       event.preventDefault();
+      if (props.item.queued) {
+        throw new Error("assertion error: item already queued and button must be disabled");
+      }
       onEnqueueModalOpen(props.item);
     },
     [onEnqueueModalOpen, props.item]
@@ -72,7 +75,12 @@ export const ItemCard: FC<ItemCardProps> = (props) => {
           >
             {props.item.category}
           </span>
-          <button onClick={handleClick} className={styles.iconButton} title="enqueue" disabled={props.queueing}>
+          <button
+            onClick={handleClick}
+            className={styles.iconButton}
+            title={props.item.queued ? "already queued" : "enqueue"}
+            disabled={props.queueing || props.item.queued}
+          >
             <Image src="/download.svg" width="16" height="16" alt="download" />
           </button>
         </div>
