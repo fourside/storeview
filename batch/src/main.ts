@@ -79,10 +79,14 @@ async function subscribe(dbClient: PrismaClient): Promise<void> {
         fs.mkdirSync(directory);
       }
       const imageCount = fs.readdirSync(directory).length;
-      await scrapeImages(queue.url, directory, imageCount);
-      const { fileName, zip } = await archive(directory);
-      const { bucketKey } = await uploadZipToR2(fileName, zip);
-      queue.archiveUrl = bucketKey;
+      if (imageCount < queue.totalPage) {
+        await scrapeImages(queue.url, directory, imageCount);
+      }
+      if (queue.archiveUrl == undefined) {
+        const { fileName, zip } = await archive(directory);
+        const { bucketKey } = await uploadZipToR2(fileName, zip);
+        queue.archiveUrl = bucketKey;
+      }
       await dequeue(dbClient, queue);
       await sleep(1000 * 10);
     } catch (error) {
