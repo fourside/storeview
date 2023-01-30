@@ -3,7 +3,7 @@
 import { Item } from "@prisma/client";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { fetchItems, postQueue, putReadAll } from "../fetch-client";
-import { NotReadCountData, ProgressData } from "../type";
+import { ItemData, NotReadCountData, ProgressData } from "../type";
 import { useIntersectionObserver } from "../use-intersection-observer";
 import { EnqueueDialog } from "./enqueue-dialog";
 import { ItemCard } from "./item-card";
@@ -13,7 +13,7 @@ import { ProgressDialog } from "./progress-dialog";
 import { useToaster } from "./toaster";
 
 type ItemsComponentProps = {
-  items: Item[];
+  items: ItemData[];
   progressDataList: ProgressData[];
   notReadCountData: NotReadCountData;
 };
@@ -27,9 +27,9 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
   const nextPageRef = useRef(1);
 
   const [activeIndex, setActiveIndex] = useState(-1);
-  const [pinnedItems, setPinnedItems] = useState<Item[]>([]);
+  const [pinnedItems, setPinnedItems] = useState<ItemData[]>([]);
 
-  const [enqueuedItem, setEnqueuedItem] = useState<Item>();
+  const [enqueuedItem, setEnqueuedItem] = useState<ItemData>();
   const [queueing, setQueueing] = useState(false);
   const { showSuccess, showFailure, Toaster } = useToaster();
 
@@ -136,7 +136,7 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
     await fetchNext();
   });
 
-  const handleEnqueueModalOpen = useCallback((item: Item) => {
+  const handleEnqueueModalOpen = useCallback((item: ItemData) => {
     setEnqueuedItem(item);
   }, []);
 

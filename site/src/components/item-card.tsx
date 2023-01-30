@@ -1,18 +1,18 @@
-import { Item } from "@prisma/client";
 import Image from "next/image";
 import { FC, MouseEvent, useCallback, useEffect, useRef } from "react";
 import { Env } from "../env";
+import { ItemData } from "../type";
 import styles from "./item-card.module.css";
 
 type ItemCardProps = {
-  item: Item;
+  item: ItemData;
   count: number;
   isActive: boolean;
   pinned: boolean;
   queueing: boolean;
   isLast: boolean; // TODO: naming
-  onEnqueueModalOpen: (item: Item) => void;
-  onReachLast: (item: Item) => void;
+  onEnqueueModalOpen: (item: ItemData) => void;
+  onReachLast: (item: ItemData) => void;
 };
 
 export const ItemCard: FC<ItemCardProps> = (props) => {

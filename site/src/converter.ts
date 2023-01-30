@@ -2,8 +2,23 @@ import { NotReadCount } from "@prisma/client";
 import fs from "node:fs";
 import path from "node:path";
 import { dateFormat } from "./date-format";
-import { QueueWithItem } from "./db";
-import { NotReadCountData, ProgressData } from "./type";
+import { ItemWithQueue, QueueWithItem } from "./db";
+import { ItemData, NotReadCountData, ProgressData } from "./type";
+
+export function convertItem(itemWithQueue: ItemWithQueue): ItemData {
+  return {
+    id: itemWithQueue.id,
+    title: itemWithQueue.title,
+    url: itemWithQueue.url,
+    category: itemWithQueue.category,
+    totalPage: itemWithQueue.totalPage,
+    publishedAt: itemWithQueue.publishedAt,
+    removed: itemWithQueue.removed,
+    thumbnailFileName: itemWithQueue.thumbnailFileName,
+    queued: itemWithQueue.Queue !== null,
+    archiveUrl: itemWithQueue.Queue?.archiveUrl ?? undefined,
+  };
+}
 
 export function convertQueueToProgress(queue: QueueWithItem): ProgressData {
   if (queue.dequeued) {

@@ -1,8 +1,7 @@
-import { Item } from "@prisma/client";
 import { z } from "zod";
-import { ProgressData } from "./type";
+import { ItemData, ProgressData } from "./type";
 
-export async function fetchItems(page = 0): Promise<Item[]> {
+export async function fetchItems(page = 0): Promise<ItemData[]> {
   const res = await fetch(`/api/items${page === 0 ? "" : `?page=${page}`}`);
   const json = await res.json();
   const result = itemResponse.safeParse(json);
@@ -18,10 +17,12 @@ const itemResponse = z.array(
     title: z.string(),
     url: z.string(),
     category: z.string(),
-    removed: z.boolean(),
     totalPage: z.number(),
     publishedAt: z.string(),
+    removed: z.boolean(),
     thumbnailFileName: z.string(),
+    queued: z.boolean(),
+    archiveUrl: z.string().optional(),
   })
 );
 

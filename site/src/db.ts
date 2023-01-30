@@ -2,12 +2,17 @@ import { Image, Item, NotReadCount, PrismaClient, Queue } from "orm";
 
 const prisma = new PrismaClient();
 
-export async function getItems(page = 0): Promise<Item[]> {
+export type ItemWithQueue = Item & { Queue: Queue | null };
+
+export async function getItems(page = 0): Promise<ItemWithQueue[]> {
   const perPage = 90;
   return await prisma.item.findMany({
     orderBy: [{ publishedAt: "desc" }, { id: "asc" }],
     skip: page * perPage,
     take: perPage,
+    include: {
+      Queue: true,
+    },
   });
 }
 

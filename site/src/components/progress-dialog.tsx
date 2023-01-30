@@ -1,7 +1,6 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Progress from "@radix-ui/react-progress";
 import Image from "next/image";
-import { it } from "node:test";
 import { FC, useEffect, useMemo, useState } from "react";
 import { getProgressDataList } from "../fetch-client";
 import { ProgressData } from "../type";

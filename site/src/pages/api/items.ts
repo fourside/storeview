@@ -1,9 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { convertItem } from "../../converter";
 import { getItems } from "../../db";
+import { ItemData } from "../../type";
 
 export default async function handler(
   req: Pick<NextApiRequest, "query" | "method">,
-  res: Pick<NextApiResponse, "status">
+  res: Pick<NextApiResponse<ItemData[]>, "status">
 ): Promise<void> {
   if (req.method !== "GET") {
     res.status(405).end();
@@ -11,7 +13,7 @@ export default async function handler(
   }
   const { page } = parseQuery(req.query);
   const items = await getItems(page);
-  res.status(200).json(items);
+  res.status(200).json(items.map(convertItem));
 }
 
 function parseQuery(query: NextApiRequest["query"]): { page: number } {
