@@ -8,7 +8,6 @@ type ItemCardProps = {
   item: ItemData;
   count: number;
   isActive: boolean;
-  pinned: boolean;
   queueing: boolean;
   isLast: boolean; // TODO: naming
   onEnqueueModalOpen: (item: ItemData) => void;
@@ -48,7 +47,6 @@ export const ItemCard: FC<ItemCardProps> = (props) => {
       href={props.item.url}
       className={styles.container}
       data-active={props.isActive || undefined}
-      data-pinned={props.pinned || undefined}
       target="_blank"
       rel="noreferrer"
       ref={ref}

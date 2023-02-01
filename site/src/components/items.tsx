@@ -26,87 +26,18 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
   const [reachedLast, setReachedLast] = useState(false);
   const nextPageRef = useRef(1);
 
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const [pinnedItems, setPinnedItems] = useState<ItemData[]>([]);
-
-  const [enqueuedItem, setEnqueuedItem] = useState<ItemData>();
   const [queueing, setQueueing] = useState(false);
   const { showSuccess, showFailure, Toaster } = useToaster();
 
-  const prevKeyRef = useRef<string>();
-
-  const [showProgress, setShowProgress] = useState(false);
-
-  useEffect(() => {
-    const handler = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        if (enqueuedItem !== undefined) {
-          setEnqueuedItem(undefined);
-        }
-      }
-      if (enqueuedItem !== undefined) {
-        // not capture key event in modal except esc
-        return;
-      }
-      if (event.key === "s") {
-        setShowProgress((prev) => !prev);
-      }
-      if (event.key === "g" && prevKeyRef.current === "g") {
-        setActiveIndex(0);
-      }
-      if (event.key === "j") {
-        setActiveIndex((prev) => {
-          return prev >= items.length - 1 ? prev : prev + 1;
-        });
-      }
-      if (event.key === "k") {
-        setActiveIndex((prev) => {
-          return prev === 0 ? prev : prev - 1;
-        });
-      }
-      if (event.key === "p") {
-        setPinnedItems((prev) => {
-          if (activeIndex < 0) {
-            return prev;
-          }
-          const activeItem = items[activeIndex];
-          if (activeItem === undefined) {
-            return prev;
-          }
-          if (prev.some((it) => it.id === activeItem.id)) {
-            return prev.filter((it) => it.id !== activeItem.id);
-          }
-          return [...prev, activeItem];
-        });
-        if (activeIndex > -1) {
-          setActiveIndex((prev) => prev + 1);
-        }
-      }
-      if (event.key === "o") {
-        if (pinnedItems.length > 0) {
-          pinnedItems.forEach((it) => window.open(it.url, "_blank", "noopener,noreferrer"));
-          setPinnedItems([]);
-        } else {
-          const activeItem = items[activeIndex];
-          if (activeItem !== undefined) {
-            window.open(activeItem.url, "_blank", "noopener,noreferrer");
-          }
-        }
-      }
-      if (event.key === "e") {
-        const activeItem = items[activeIndex];
-        if (activeItem !== undefined) {
-          event.preventDefault();
-          setEnqueuedItem(activeItem);
-        }
-      }
-      prevKeyRef.current = event.key;
-    };
-    document.addEventListener("keydown", handler);
-    return () => {
-      document.removeEventListener("keydown", handler);
-    };
-  }, [activeIndex, enqueuedItem, items, pinnedItems]);
+  const {
+    activeIndex,
+    enqueueDialogState,
+    openEnqueueDialog,
+    closeEnqueueDialog,
+    progressOpen,
+    openProgressDialog,
+    closeProgressDialog,
+  } = useKeyboardNavigation(items);
 
   const fetchNext = useCallback(async () => {
     if (loading || reachedLast) {
@@ -136,19 +67,11 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
     await fetchNext();
   });
 
-  const handleEnqueueModalOpen = useCallback((item: ItemData) => {
-    setEnqueuedItem(item);
-  }, []);
-
-  const handleEnqueueModalClose = useCallback(() => {
-    setEnqueuedItem(undefined);
-  }, []);
-
   const handleEnqueue = useCallback(
     async (param: { directory: string; url: string; itemId: string }) => {
       setQueueing(true);
       try {
-        setEnqueuedItem(undefined);
+        closeEnqueueDialog();
         await postQueue(param);
         showSuccess("success to queue");
       } catch (error) {
@@ -158,16 +81,8 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
         setQueueing(false);
       }
     },
-    [showFailure, showSuccess]
+    [closeEnqueueDialog, showFailure, showSuccess]
   );
-
-  const handleShowProgress = useCallback(() => {
-    setShowProgress(true);
-  }, []);
-
-  const handleCloseProgress = useCallback(() => {
-    setShowProgress(false);
-  }, []);
 
   const requesting = useRef(false);
 
@@ -205,7 +120,7 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
           <span>{notReadCountData.lastReadAt}</span>
         </div>
       </div>
-      <button onClick={handleShowProgress}>show progress</button>
+      <button onClick={openProgressDialog}>show progress</button>
       <div className={styles.grid}>
         {items.map((item, index) => (
           <ItemCard
@@ -213,26 +128,119 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
             item={item}
             count={index + 1}
             isActive={index === activeIndex}
-            pinned={pinnedItems.some((it) => it.id === item.id)}
-            queueing={queueing && item === enqueuedItem}
+            queueing={queueing}
             isLast={activeIndex !== 0 ? notReadCountData.count === activeIndex : false}
-            onEnqueueModalOpen={handleEnqueueModalOpen}
+            onEnqueueModalOpen={openEnqueueDialog}
             onReachLast={handleReachLast}
           />
         ))}
       </div>
-      {pinnedItems.length > 0 && (
-        <div className={styles.pinnedCount}>
-          pinned <strong>{pinnedItems.length}</strong> items
-        </div>
+      {enqueueDialogState.open && (
+        <EnqueueDialog item={enqueueDialogState.data} onEnqueue={handleEnqueue} onClose={closeEnqueueDialog} />
       )}
-      {enqueuedItem !== undefined && (
-        <EnqueueDialog item={enqueuedItem} onEnqueue={handleEnqueue} onClose={handleEnqueueModalClose} />
-      )}
-      {showProgress && <ProgressDialog onClose={handleCloseProgress} progressList={props.progressDataList} />}
+      {progressOpen && <ProgressDialog onClose={closeProgressDialog} progressList={props.progressDataList} />}
       {Toaster}
       {loading && <Loader />}
       <div ref={observedRef} />
     </div>
   );
 };
+
+type DialogState<T> = { open: false } | { open: true; data: T };
+
+function useKeyboardNavigation(items: ItemData[]): {
+  activeIndex: number;
+  enqueueDialogState: DialogState<ItemData>;
+  openEnqueueDialog: (item: ItemData) => void;
+  closeEnqueueDialog: () => void;
+  progressOpen: boolean;
+  openProgressDialog: () => void;
+  closeProgressDialog: () => void;
+} {
+  const prevKeyRef = useRef<string>();
+
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [enqueueDialogState, setEnqueueDialogState] = useState<DialogState<ItemData>>({ open: false });
+  const [progressOpen, setProgressOpen] = useState(false);
+
+  const openProgressDialog = useCallback(() => {
+    setProgressOpen(true);
+  }, []);
+
+  const closeProgressDialog = useCallback(() => {
+    setProgressOpen(false);
+  }, []);
+
+  const openEnqueueDialog = useCallback((item: ItemData) => {
+    setEnqueueDialogState({ open: true, data: item });
+  }, []);
+
+  const closeEnqueueDialog = useCallback(() => {
+    setEnqueueDialogState({ open: false });
+  }, []);
+
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if (progressOpen) {
+        // not capture key event in modal except Escape
+        if (event.key === "Escape") {
+          setProgressOpen(false);
+        }
+        return;
+      }
+      if (enqueueDialogState.open) {
+        // not capture key event in modal except Escape
+        if (event.key === "Escape") {
+          setEnqueueDialogState({ open: false });
+        }
+        return;
+      }
+
+      if (event.key === "s") {
+        setProgressOpen((prev) => !prev);
+      }
+      if (event.key === "g" && prevKeyRef.current === "g") {
+        setActiveIndex(0);
+      }
+      if (event.key === "j") {
+        setActiveIndex((prev) => {
+          return prev >= items.length - 1 ? prev : prev + 1;
+        });
+      }
+      if (event.key === "k") {
+        setActiveIndex((prev) => {
+          return prev === 0 ? prev : prev - 1;
+        });
+      }
+      if (event.key === "o") {
+        const activeItem = items[activeIndex];
+        if (activeItem !== undefined) {
+          window.open(activeItem.url, "_blank", "noopener,noreferrer");
+        }
+      }
+      if (event.key === "e") {
+        const activeItem = items[activeIndex];
+        if (activeItem !== undefined) {
+          event.preventDefault();
+          setEnqueueDialogState({ open: true, data: activeItem });
+        }
+      }
+      prevKeyRef.current = event.key;
+    };
+
+    document.addEventListener("keydown", handler);
+    return () => {
+      document.removeEventListener("keydown", handler);
+    };
+  }, [activeIndex, enqueueDialogState.open, items, progressOpen]);
+
+  return {
+    activeIndex,
+    enqueueDialogState,
+    openEnqueueDialog,
+    closeEnqueueDialog,
+    progressOpen,
+    openProgressDialog,
+    closeProgressDialog,
+  };
+}

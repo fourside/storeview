@@ -12,10 +12,6 @@
   outline: 2px solid #0900ff;
 }
 
-.container[data-pinned] {
-  opacity: 0.5;
-}
-
 .image {
   object-fit: cover;
   aspect-ratio: 16 / 9;
