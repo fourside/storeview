@@ -11,6 +11,8 @@ export type ItemData = {
   archiveUrl?: string;
 };
 
+export type ArchivedItemData = ItemData & { archiveUrl: string };
+
 export type ProgressData = {
   directory: string;
   progress: number;

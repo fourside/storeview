@@ -16,6 +16,25 @@ export async function getItems(page = 0): Promise<ItemWithQueue[]> {
   });
 }
 
+export async function getArchivedItems(page = 0): Promise<ItemWithQueue[]> {
+  const perPage = 90;
+  return await prisma.item.findMany({
+    orderBy: [{ Queue: { updatedAt: "desc" } }],
+    skip: page * perPage,
+    take: perPage,
+    include: {
+      Queue: true,
+    },
+    where: {
+      Queue: {
+        archiveUrl: {
+          not: null,
+        },
+      },
+    },
+  });
+}
+
 export async function getImage(itemId: string): Promise<Image | null> {
   return await prisma.image.findUnique({
     where: { itemId: itemId },
