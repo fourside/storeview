@@ -8,6 +8,10 @@
     "subscribe": {
       "outputs": []
     },
+    "remove": {
+      "outputs": [],
+      "cache": false
+    },
     "dev": {
       "dependsOn": ["^db:generate"],
       "cache": false

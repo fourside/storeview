@@ -6,6 +6,7 @@
   "scripts": {
     "items": "turbo run items",
     "subscribe": "turbo run subscribe",
+    "remove": "turbo run remove",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "test": "turbo run test",

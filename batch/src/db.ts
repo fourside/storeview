@@ -1,4 +1,4 @@
-import { PrismaClient } from "orm";
+import { Item, PrismaClient } from "orm";
 import type { ItemData, QueueData } from "./type";
 
 export type LatestData = {
@@ -57,6 +57,20 @@ export async function removeItem(client: PrismaClient, itemId: string): Promise<
   });
 }
 
+export async function removeItems(client: PrismaClient, itemIds: string[]): Promise<number> {
+  const result = await client.item.updateMany({
+    where: {
+      id: {
+        in: itemIds,
+      },
+    },
+    data: {
+      removed: true,
+    },
+  });
+  return result.count;
+}
+
 export async function getQueueData(client: PrismaClient): Promise<QueueData[]> {
   const queueDataList = await client.queue.findMany({
     where: {
@@ -112,4 +126,25 @@ export async function incrementNotReadCount(client: PrismaClient, count: number)
       },
     });
   }
+}
+
+export async function getStaleItemsWithoutArchived(client: PrismaClient, criteriaDate: string): Promise<Item[]> {
+  return await client.item.findMany({
+    where: {
+      publishedAt: {
+        lt: criteriaDate,
+      },
+      removed: false,
+      OR: [
+        {
+          Queue: null,
+        },
+        {
+          Queue: {
+            archiveUrl: null,
+          },
+        },
+      ],
+    },
+  });
 }

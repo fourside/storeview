@@ -1,4 +1,10 @@
-import { S3, PutObjectCommand, type PutObjectCommandInput } from "@aws-sdk/client-s3";
+import {
+  S3,
+  PutObjectCommand,
+  type PutObjectCommandInput,
+  type DeleteObjectCommandInput,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { Env } from "./env";
 import type { ImageData } from "./type";
 
@@ -13,6 +19,17 @@ export async function uploadImagesToR2(images: ImageData[]): Promise<void> {
       ContentType: mimeType,
     };
     await r2Client.send(new PutObjectCommand(input));
+  }
+}
+
+export async function removeImagesInR2(imageFilenames: string[]): Promise<void> {
+  const r2Client = createR2Client();
+  for (const filename of imageFilenames) {
+    const input: DeleteObjectCommandInput = {
+      Bucket: Env.cloudflareBucketName,
+      Key: filename,
+    };
+    await r2Client.send(new DeleteObjectCommand(input));
   }
 }
 

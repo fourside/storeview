@@ -8,14 +8,16 @@ import {
   getClient,
   getLatestData,
   getQueueData,
+  getStaleItemsWithoutArchived,
   incrementNotReadCount,
   removeItem,
+  removeItems,
   saveItems,
 } from "./db";
 import { Env } from "./env";
 import { fetchImages } from "./http";
-import { itemsLogger, rootLogger, subscribeLogger } from "./logger";
-import { uploadImagesToR2, uploadZipToR2 } from "./r2-client";
+import { itemsLogger, removeLogger, rootLogger, subscribeLogger } from "./logger";
+import { removeImagesInR2, uploadImagesToR2, uploadZipToR2 } from "./r2-client";
 import { RemovedError } from "./removed-error";
 import { scrapeImages } from "./scrape-images";
 import { scrapeItems } from "./scrape-items";
@@ -32,8 +34,11 @@ async function main(args: string[]): Promise<void> {
       case "subscribe":
         dbClient = getClient();
         return await subscribe(dbClient);
+      case "remove":
+        dbClient = getClient();
+        return await removeImagesAndItems(dbClient);
       default:
-        rootLogger.error("pass subcommand, items or subscribe");
+        rootLogger.error("pass subcommand, items, subscribe or remove");
         process.exit(-1);
     }
   } catch (error) {
@@ -104,4 +109,32 @@ async function subscribe(dbClient: PrismaClient): Promise<void> {
 
   await sleep(10 * 60 * 1000);
   await subscribe(dbClient);
+}
+
+async function removeImagesAndItems(dbClient: PrismaClient): Promise<void> {
+  const today = new Date();
+  const oneMonthAgo = new Date(new Date().setDate(today.getDate() - 15));
+  const criteriaDate = new Intl.DateTimeFormat("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Tokyo",
+  })
+    .format(oneMonthAgo)
+    .replaceAll("/", "-");
+  const items = await getStaleItemsWithoutArchived(dbClient, criteriaDate);
+  const imageFilenames = items.map((it) => it.thumbnailFileName).filter((it) => it !== "");
+  if (imageFilenames.length === 0) {
+    removeLogger.info("nothing deleted");
+    return;
+  }
+  await removeImagesInR2(imageFilenames);
+  const count = await removeItems(
+    dbClient,
+    items.map((it) => it.id)
+  );
+  removeLogger.info(`${count} items removed`);
 }
