@@ -26,7 +26,7 @@ export async function uploadZipToR2(fileName: string, zip: Buffer): Promise<{ bu
     ContentType: "application/zip",
   };
   await r2Client.send(new PutObjectCommand(input));
-  return { bucketKey: `${bucket}/${fileName}` };
+  return { bucketKey: fileName };
 }
 
 function createR2Client(): S3 {
