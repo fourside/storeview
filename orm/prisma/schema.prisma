@@ -19,14 +19,7 @@ model Item {
   publishedAt       String
   removed           Boolean @default(false)
   thumbnailFileName String
-  Image             Image?
   Queue             Queue?
-}
-
-model Image {
-  itemId String @id
-  item   Item   @relation(fields: [itemId], references: [id])
-  image  Bytes
 }
 
 model Latest {
