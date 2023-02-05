@@ -1,5 +1,5 @@
 import { PrismaClient } from "orm";
-import type { ItemData, ImageData, QueueData } from "./type";
+import type { ItemData, QueueData } from "./type";
 
 export type LatestData = {
   id: string;
@@ -22,7 +22,7 @@ export async function getLatestData(client: PrismaClient): Promise<LatestData> {
   return { id: latest.itemId, publishedAt: latest.publishedAt };
 }
 
-export async function saveItemsAndImages(client: PrismaClient, items: ItemData[], images: ImageData[]): Promise<void> {
+export async function saveItems(client: PrismaClient, items: ItemData[]): Promise<void> {
   await client.$transaction([
     client.item.createMany({
       data: items.map((it) => ({
@@ -33,13 +33,6 @@ export async function saveItemsAndImages(client: PrismaClient, items: ItemData[]
         totalPage: it.totalPage,
         publishedAt: it.publishedAt,
         thumbnailFileName: it.thumbnailFileName,
-      })),
-      skipDuplicates: true,
-    }),
-    client.image.createMany({
-      data: images.map((it) => ({
-        image: it.image,
-        itemId: it.itemId,
       })),
       skipDuplicates: true,
     }),

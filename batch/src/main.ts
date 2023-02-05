@@ -10,7 +10,7 @@ import {
   getQueueData,
   incrementNotReadCount,
   removeItem,
-  saveItemsAndImages,
+  saveItems,
 } from "./db";
 import { Env } from "./env";
 import { fetchImages } from "./http";
@@ -63,7 +63,7 @@ async function scrapeItemsAndImages(dbClient: PrismaClient): Promise<void> {
     return;
   }
   const images = await fetchImages(items);
-  await saveItemsAndImages(dbClient, items, images);
+  await saveItems(dbClient, items);
   await uploadImagesToR2(images);
   await incrementNotReadCount(dbClient, items.length);
   itemsLogger.info("\ndone", new Date());
