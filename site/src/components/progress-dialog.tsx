@@ -15,11 +15,11 @@ export const ProgressDialog: FC<ProgressDialogProps> = (props) => {
   const [progressList, setProgressList] = useState(props.progressList);
 
   useEffect(() => {
-    if (progressList.every((it) => it.total === it.progress)) {
-      return;
-    }
     const timer = setTimeout(async () => {
       const list = await getProgressDataList();
+      if (list.every((it) => it.total === it.progress)) {
+        return;
+      }
       setProgressList(list);
     }, 5000);
     () => {

@@ -17,7 +17,6 @@ export type ProgressData = {
   directory: string;
   progress: number;
   total: number;
-  archiveUrl: string | undefined;
 };
 
 export type NotReadCountData = {
