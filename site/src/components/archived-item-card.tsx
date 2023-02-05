@@ -30,7 +30,7 @@ export const ArchivedItemCard: FC<ItemCardProps> = (props) => {
       <div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={`${Env.thumbnailHost}/${props.item.thumbnailFileName}`}
+          src={`${Env.cloudflareBucketName}/${props.item.thumbnailFileName}`}
           loading="lazy"
           width="200"
           height="350"
