@@ -1,42 +1,18 @@
-import { PrismaClient } from "@prisma/client";
-import fs from "node:fs";
-import path from "node:path";
-import { archive } from "./archive";
-import {
-  closeClient,
-  dequeue,
-  getClient,
-  getLatestData,
-  getQueueData,
-  getStaleItemsWithoutArchived,
-  incrementNotReadCount,
-  removeItem,
-  removeItems,
-  saveItems,
-} from "./db";
-import { Env } from "./env";
-import { fetchImages } from "./http";
-import { itemsLogger, removeLogger, rootLogger, subscribeLogger } from "./logger";
-import { removeImagesInR2, uploadImagesToR2, uploadZipToR2 } from "./r2-client";
-import { RemovedError } from "./removed-error";
-import { scrapeImages } from "./scrape-images";
-import { scrapeItems } from "./scrape-items";
-import { sleep } from "./sleep";
+import { itemsCommand } from "./items-command";
+import { rootLogger } from "./logger";
+import { removeCommand } from "./remove-command";
+import { subscribeCommand } from "./subscribe-command";
 
 async function main(args: string[]): Promise<void> {
   const subCommand = args[0];
-  let dbClient;
   try {
     switch (subCommand) {
       case "items":
-        dbClient = getClient();
-        return await scrapeItemsAndImages(dbClient);
+        return itemsCommand();
       case "subscribe":
-        dbClient = getClient();
-        return await subscribe(dbClient);
+        return subscribeCommand();
       case "remove":
-        dbClient = getClient();
-        return await removeImagesAndItems(dbClient);
+        return removeCommand();
       default:
         rootLogger.error("pass subcommand, items, subscribe or remove");
         process.exit(-1);
@@ -44,10 +20,6 @@ async function main(args: string[]): Promise<void> {
   } catch (error) {
     rootLogger.error(error);
     process.exit(-1);
-  } finally {
-    if (dbClient !== undefined) {
-      closeClient(dbClient);
-    }
   }
 }
 
@@ -56,85 +28,4 @@ if (process.argv[1] === __filename) {
     await main(process.argv.slice(2));
     process.exit(0);
   })();
-}
-
-async function scrapeItemsAndImages(dbClient: PrismaClient): Promise<void> {
-  itemsLogger.info("start", new Date());
-  const latestData = await getLatestData(dbClient);
-
-  const items = await scrapeItems(Env.targetUrl, latestData);
-  itemsLogger.info(`scraped count: ${items.length}`);
-  if (items.length === 0) {
-    return;
-  }
-  const images = await fetchImages(items);
-  await saveItems(dbClient, items);
-  await uploadImagesToR2(images);
-  await incrementNotReadCount(dbClient, items.length);
-  itemsLogger.info("\ndone", new Date());
-}
-
-async function subscribe(dbClient: PrismaClient): Promise<void> {
-  const queueList = await getQueueData(dbClient);
-
-  for (const queue of queueList) {
-    try {
-      const directory = path.join("../data/", queue.directory);
-      if (!fs.existsSync(directory)) {
-        fs.mkdirSync(directory);
-      }
-      const imageCount = fs.readdirSync(directory).length;
-      if (imageCount < queue.totalPage) {
-        await scrapeImages(queue.url, directory, imageCount);
-      }
-      if (queue.archiveUrl == undefined) {
-        const { fileName, zip } = await archive(directory);
-        const { bucketKey } = await uploadZipToR2(fileName, zip);
-        queue.archiveUrl = bucketKey;
-      }
-      await dequeue(dbClient, queue);
-      await sleep(1000 * 10);
-    } catch (error) {
-      if (error instanceof RemovedError) {
-        subscribeLogger.error("removed", queue);
-        await dequeue(dbClient, queue);
-        if (queue.itemId !== undefined) {
-          await removeItem(dbClient, queue.itemId);
-        }
-        continue;
-      }
-      subscribeLogger.error(error, "caused queue is ", queue);
-    }
-  }
-
-  await sleep(10 * 60 * 1000);
-  await subscribe(dbClient);
-}
-
-async function removeImagesAndItems(dbClient: PrismaClient): Promise<void> {
-  const today = new Date();
-  const oneMonthAgo = new Date(new Date().setDate(today.getDate() - 15));
-  const criteriaDate = new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "Asia/Tokyo",
-  })
-    .format(oneMonthAgo)
-    .replaceAll("/", "-");
-  const items = await getStaleItemsWithoutArchived(dbClient, criteriaDate);
-  const imageFilenames = items.map((it) => it.thumbnailFileName).filter((it) => it !== "");
-  if (imageFilenames.length === 0) {
-    removeLogger.info("nothing deleted");
-    return;
-  }
-  await removeImagesInR2(imageFilenames);
-  const count = await removeItems(
-    dbClient,
-    items.map((it) => it.id)
-  );
-  removeLogger.info(`${count} items removed`);
 }
