@@ -209,9 +209,19 @@ function useKeyboardNavigation(items: ItemData[]): {
           return prev >= items.length - 1 ? prev : prev + 1;
         });
       }
+      if (event.key === "J") {
+        setActiveIndex((prev) => {
+          return prev >= items.length - 1 ? prev : Math.min(prev + 3, items.length - 1);
+        });
+      }
       if (event.key === "k") {
         setActiveIndex((prev) => {
           return prev === 0 ? prev : prev - 1;
+        });
+      }
+      if (event.key === "K") {
+        setActiveIndex((prev) => {
+          return prev === 0 ? prev : Math.max(prev - 3, 0);
         });
       }
       if (event.key === "o") {
