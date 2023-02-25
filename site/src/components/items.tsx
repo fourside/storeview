@@ -1,6 +1,7 @@
 "use client";
 
 import { Item } from "@prisma/client";
+import Link from "next/link";
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { fetchItems, postQueue, putReadAll } from "../fetch-client";
 import { ItemData, NotReadCountData, ProgressData } from "../type";
@@ -121,6 +122,7 @@ export const ItemsComponent: FC<ItemsComponentProps> = (props) => {
         </div>
       </div>
       <button onClick={openProgressDialog}>show progress</button>
+      <Link href="/archives">to archives</Link>
       <div className={styles.grid}>
         {items.map((item, index) => (
           <ItemCard

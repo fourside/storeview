@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FC, useEffect, useRef, useState } from "react";
 import { ArchivedItemData } from "../type";
 import styles from "./archived-items.module.css";
@@ -15,6 +16,7 @@ export const ArchivedItemsComponent: FC<Props> = (props) => {
 
   return (
     <div className={styles.container}>
+      <Link href="/">back</Link>
       <div className={styles.grid}>
         {items.map((item, index) => (
           <ArchivedItemCard key={item.id} item={item} count={index + 1} isActive={index === activeIndex} />
