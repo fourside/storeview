@@ -1,4 +1,4 @@
-import { Image, Item, NotReadCount, PrismaClient, Queue } from "orm";
+import { Item, NotReadCount, PrismaClient, Queue } from "orm";
 
 const prisma = new PrismaClient();
 
@@ -32,12 +32,6 @@ export async function getArchivedItems(page = 0): Promise<ItemWithQueue[]> {
         },
       },
     },
-  });
-}
-
-export async function getImage(itemId: string): Promise<Image | null> {
-  return await prisma.image.findUnique({
-    where: { itemId: itemId },
   });
 }
 
