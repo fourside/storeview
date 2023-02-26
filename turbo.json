@@ -6,18 +6,17 @@
       "cache": false
     },
     "subscribe": {
-      "outputs": []
+      "outputs": [],
+      "cache": false
     },
     "remove": {
       "outputs": [],
       "cache": false
     },
     "dev": {
-      "dependsOn": ["^db:generate"],
       "cache": false
     },
     "build": {
-      "dependsOn": ["^db:generate"],
       "outputs": ["./site/.next"]
     },
     "lint": {
@@ -28,20 +27,6 @@
     },
     "test": {
       "outputs": []
-    },
-    "db:migrate:dev": {
-      "cache": false
-    },
-    "db:generate": {
-      "cache": false
-    },
-    "db:validate": {
-      "outputs": [],
-      "cache": false
-    },
-    "db:format": {
-      "outputs": [],
-      "cache": false
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Item, NotReadCount, PrismaClient, Queue } from "orm";
+import { Item, NotReadCount, PrismaClient, Queue } from "@prisma/client";
 
 const prisma = new PrismaClient();
 

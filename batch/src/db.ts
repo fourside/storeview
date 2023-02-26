@@ -1,4 +1,4 @@
-import { Item, PrismaClient } from "orm";
+import { Item, PrismaClient } from "@prisma/client";
 import type { ItemData, QueueData } from "./type";
 
 export type LatestData = {
