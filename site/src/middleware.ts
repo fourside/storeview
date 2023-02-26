@@ -15,7 +15,7 @@ export function middleware(req: NextRequest) {
       return NextResponse.rewrite(url);
     }
 
-    const [user, password] = Buffer.from(authValue, "base64").toString().split(":");
+    const [user, password] = atob(authValue).split(":");
     if (user === process.env.BASIC_AUTH_USER && password === process.env.BASIC_AUTH_PASS) {
       return NextResponse.next();
     }
