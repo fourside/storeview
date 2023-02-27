@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { archive } from "./archive";
 import { closeClient, dequeue, getClient, getQueueData, removeItem } from "./db";
+import { Env } from "./env";
 import { subscribeLogger } from "./logger";
 import { uploadZipToR2 } from "./r2-client";
 import { RemovedError } from "./removed-error";
@@ -16,7 +17,7 @@ export async function subscribeCommand(): Promise<void> {
 
     for (const queue of queueList) {
       try {
-        const directory = path.join("../data/", queue.directory);
+        const directory = path.join(Env.dataDir, queue.directory);
         if (!fs.existsSync(directory)) {
           fs.mkdirSync(directory);
         }
