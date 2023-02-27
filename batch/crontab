@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+PATH=/usr/local/bin:/bin:/usr/bin
+0 6,12 * * *   cd /app && npm run items
+0 * * * *   cd /app && npm run subscribe
+0 0 1 * *   cd /app && npm run remove
