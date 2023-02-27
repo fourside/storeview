@@ -1,0 +1,61 @@
+services:
+  db:
+    build: ./db
+    image: db
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/logs:/var/log/mysql
+      - type: volume
+        source: mysql_data
+        target: /var/lib/mysql
+        read_only: false
+    environment:
+      MYSQL_USER: ${MYSQL_USER?MYSQL_USER not passed}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD?MYSQL_PASSWORD not passed}
+      MYSQL_DATABASE: ${MYSQL_DATABASE?MYSQL_DATABASE not passed}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD?MYSQL_PASSWORD not passed}
+      TZ: ${TZ?TZ not passed}
+
+  site:
+    build:
+      context: .
+      dockerfile: ./site/Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL?DATABASE_URL not passed}
+        NEXT_PUBLIC_CLOUDFLARE_PUBLIC_BUCKET_URL: ${NEXT_PUBLIC_CLOUDFLARE_PUBLIC_BUCKET_URL?NEXT_PUBLIC_CLOUDFLARE_PUBLIC_BUCKET_URL not passed}
+    image: site
+    ports:
+      - 3000:3000
+    environment:
+      DATABASE_URL: ${DATABASE_URL?DATABASE_URL not passed}
+      BASIC_AUTH_USER: ${BASIC_AUTH_USER?BASIC_AUTH_USER not passed}
+      BASIC_AUTH_PASS: ${BASIC_AUTH_PASS?BASIC_AUTH_PASS not passed}
+
+  batch:
+    build:
+      context: .
+      dockerfile: ./batch/Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL?DATABASE_URL not passed}
+    image: batch
+    volumes:
+      - type: volume
+        source: data_dir
+        target: /data
+        read_only: false
+    cap_add:
+      - ALL
+    environment:
+      DATABASE_URL: ${DATABASE_URL?DATABASE_URL not passed}
+      CHROME_PATH: ${CHROME_PATH?CHROME_PATH not passed}
+      TARGET_URL: ${TARGET_URL?TARGET_URL not passed}
+      DATA_DIR: ${DATA_DIR?DATA_DIR not passed}
+      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID?CLOUDFLARE_ACCOUNT_ID not passed}
+      CLOUDFLARE_ACCESS_KEY_ID: ${CLOUDFLARE_ACCESS_KEY_ID?CLOUDFLARE_ACCESS_KEY_ID not passed}
+      CLOUDFLARE_SECRET_ACCESS_KEY: ${CLOUDFLARE_SECRET_ACCESS_KEY?CLOUDFLARE_SECRET_ACCESS_KEY not passed}
+      CLOUDFLARE_BUCKET_NAME: ${CLOUDFLARE_BUCKET_NAME?CLOUDFLARE_BUCKET_NAME not passed}
+
+volumes:
+  mysql_data:
+  data_dir:

@@ -1,0 +1,10 @@
+Dockerfile
+node_modules
+data
+out
+.next
+next-env.d.ts
+.turbo
+.env
+orm/.env
+*.tsbuildinfo
